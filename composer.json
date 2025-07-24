@@ -1,0 +1,7 @@
+{
+    "require": {
+        "pear/http_request2": "^2.6",
+        "infobip/infobip-api-php-client": "^5.1",
+        "twilio/sdk": "^8.3"
+    }
+}
