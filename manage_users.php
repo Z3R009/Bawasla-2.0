@@ -45,7 +45,7 @@ if (isset($_POST['submit'])) {
 
 // Retrieve users
 
-$user_types = ['President', 'Treasurer', 'Meter Reader'];
+$user_types = ['Secretary'];
 $user_types_str = "'" . implode("', '", $user_types) . "'";
 
 $select = mysqli_query($connection, "SELECT * FROM users WHERE user_type IN ($user_types_str)");
@@ -156,13 +156,7 @@ $select = mysqli_query($connection, "SELECT * FROM users WHERE user_type IN ($us
                                                 placeholder="Enter Password" required autocomplete="off">
                                         </div>
                                         <div class="mb-3">
-                                            <label for="userType" class="form-label">User Type</label>
-                                            <select class="form-select" id="user_type" name="user_type">
-                                                <option selected disabled>Select User Type</option>
-                                                <option value="President">President</option>
-                                                <option value="Treasurer">Treasurer</option>
-                                                <option value="Meter Reader">Meter Reader</option>
-                                            </select>
+                                            <input type="hidden" id="user_type" name="user_type" value="Secretary">
                                         </div>
                                         <div class="modal-footer">
                                             <!-- <button type="button" class="btn btn-secondary"
@@ -204,7 +198,7 @@ $select = mysqli_query($connection, "SELECT * FROM users WHERE user_type IN ($us
                                                     <ul class="dropdown-menu dropdown-menu-end" style="z-index: 1050;"
                                                         aria-labelledby="actionDropdown">
                                                         <li><a class="dropdown-item" href="javascript:void(0)"
-                                                                onclick="editUser(<?php echo $row['user_id']; ?>, '<?php echo $row['username']; ?>', '<?php echo $row['password']; ?>', '<?php echo $row['user_type']; ?>')">
+                                                                onclick="editUser(<?php echo $row['user_id']; ?>, '<?php echo $row['username']; ?>', '<?php echo $row['password']; ?>')">
                                                                 Edit
                                                             </a>
                                                         </li>
@@ -238,20 +232,11 @@ $select = mysqli_query($connection, "SELECT * FROM users WHERE user_type IN ($us
                                         <div class="mb-3">
                                             <label for="edit_username" class="form-label">Username</label>
                                             <input type="text" class="form-control" name="username" id="edit_username"
-                                                placeholder="Enter username" required>
+                                                placeholder="Enter username" required autocomplete="off">
                                         </div>
                                         <div class="mb-3">
                                             <input type="hidden" class="form-control" id="edit_password"
                                                 placeholder="Enter Password" readonly>
-                                        </div>
-                                        <div class="mb-3">
-                                            <label for="edit_userType" class="form-label">User Type</label>
-                                            <select class="form-select" name="user_type" id="edit_userType">
-                                                <option value="President">President</option>
-                                                <option value="Treasurer">Treasurer</option>
-                                                <option value="Meter Reader">Meter Reader</option>
-                                                <option value="Member">Member</option>
-                                            </select>
                                         </div>
                                         <div class="modal-footer">
                                             <button type="button" class="btn btn-secondary"
@@ -302,20 +287,13 @@ $select = mysqli_query($connection, "SELECT * FROM users WHERE user_type IN ($us
 
     <script>
         // Function to handle the Edit button click and populate the modal with user data
-        function editUser(userId, username, password, userType) {
+        function editUser(userId, username, password) {
             // Set the form values in the modal
             document.getElementById('edit_user_id').value = userId;
             document.getElementById('edit_username').value = username;
             document.getElementById('edit_password').value = password;
 
-            // Pre-select the correct user type
-            const userTypeSelect = document.getElementById('edit_userType');
-            for (let i = 0; i < userTypeSelect.options.length; i++) {
-                if (userTypeSelect.options[i].value === userType) {
-                    userTypeSelect.options[i].selected = true;
-                    break;
-                }
-            }
+
 
             // Show the modal
             var editUserModal = new bootstrap.Modal(document.getElementById('editUserModal'));
@@ -328,7 +306,6 @@ $select = mysqli_query($connection, "SELECT * FROM users WHERE user_type IN ($us
             var userId = document.getElementById('edit_user_id').value;
             var username = document.getElementById('edit_username').value;
             var password = document.getElementById('edit_password').value;
-            var userType = document.getElementById('edit_userType').value;
 
             // Example code for sending data to the server
             // You should implement the actual save functionality, e.g., using AJAX
@@ -336,7 +313,6 @@ $select = mysqli_query($connection, "SELECT * FROM users WHERE user_type IN ($us
             console.log('user_id:', user_id);
             console.log('username:', username);
             console.log('password:', password);
-            console.log('user_type:', user_type);
 
             // Close the modal
             var editUserModal = bootstrap.Modal.getInstance(document.getElementById('editUserModal'));

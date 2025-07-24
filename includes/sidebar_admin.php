@@ -20,14 +20,14 @@ $currentPage = basename($_SERVER['PHP_SELF']);
             <div class="sb-sidenav-menu">
                 <div class="nav">
                     <!-- Navbar Brand with logo-->
-                    <a class="navbar-brand ps-3" href="dashboard_admin.php?user_id=<?php echo $user_id; ?>">
+                    <a class="navbar-brand ps-3" href="dashboard_secretary.php?user_id=<?php echo $user_id; ?>">
                         <img src="img/lg2.png" alt="Logo"
                             style="height: 100px; width: auto; max-width: 100%; margin-left: 38px; ">
                     </a>
                     <div class="sb-sidenav-menu-heading"></div>
 
-                    <a class="nav-link <?php echo $currentPage == 'dashboard_admin.php' ? 'active' : ''; ?>"
-                        href="dashboard_admin.php?user_id=<?php echo $user_id; ?>">
+                    <a class="nav-link <?php echo $currentPage == 'dashboard_secretary.php' ? 'active' : ''; ?>"
+                        href="dashboard_secretary.php?user_id=<?php echo $user_id; ?>">
                         <div class="sb-nav-link-icon"><i class="fas fa-tachometer-alt"></i></div>
                         Dashboard
                     </a>
@@ -42,6 +42,12 @@ $currentPage = basename($_SERVER['PHP_SELF']);
                         href="manage_members.php?user_id=<?php echo $user_id; ?>">
                         <div class="sb-nav-link-icon"><i class="fa-solid fa-users"></i></div>
                         Manage Members
+                    </a>
+
+                    <a class="nav-link <?php echo $currentPage == 'manage_transaction.php' ? 'active' : ''; ?>"
+                        href="manage_transaction.php?user_id=<?php echo $user_id; ?>">
+                        <div class="sb-nav-link-icon"><i class="fa-solid fa-money-bill-transfer"></i></div>
+                        Manage Transaction
                     </a>
 
                     <a class="nav-link <?php echo $currentPage == 'reports_admin.php' ? 'active' : ''; ?>"

@@ -40,14 +40,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             // }
 
             // Redirect based on user type
-            if ($_SESSION['user_type'] == 'President') {
-                header('Location: dashboard_admin.php?user_id=' . $_SESSION['user_id']);
-            } elseif ($_SESSION['user_type'] == 'Treasurer') {
-                header('Location: dashboard_treasurer.php?user_id=' . $_SESSION['user_id']);
-            } elseif ($_SESSION['user_type'] == 'Member') {
-                header('Location: dashboard_member.php?member_id=' . $_SESSION['user_id']);
-            } elseif ($_SESSION['user_type'] == 'Meter Reader') {
-                header('Location: dashboard_meter_reader.php?user_id=' . $_SESSION['user_id']);
+            if ($_SESSION['user_type'] == 'Secretary') {
+                header('Location: dashboard_secretary.php?user_id=' . $_SESSION['user_id']);
+            } elseif ($_SESSION['user_type'] == 'Admin') {
+                header('Location: manage_users.php?user_id=' . $_SESSION['user_id']);
             } else {
                 echo "<script>alert('Invalid user type value');</script>";
             }
