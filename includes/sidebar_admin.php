@@ -44,6 +44,12 @@ $currentPage = basename($_SERVER['PHP_SELF']);
                         Manage Members
                     </a>
 
+                    <a class="nav-link <?php echo $currentPage == 'manage_meter.php' ? 'active' : ''; ?>"
+                        href="manage_meter.php?user_id=<?php echo $user_id; ?>">
+                        <div class="sb-nav-link-icon"><i class="fas fa-tachometer-alt"></i></div>
+                        Manage Meter
+                    </a>
+
                     <a class="nav-link <?php echo $currentPage == 'manage_transaction.php' ? 'active' : ''; ?>"
                         href="manage_transaction.php?user_id=<?php echo $user_id; ?>">
                         <div class="sb-nav-link-icon"><i class="fa-solid fa-money-bill-transfer"></i></div>
@@ -56,8 +62,8 @@ $currentPage = basename($_SERVER['PHP_SELF']);
                         Billing Reports
                     </a>
 
-                    <a class="nav-link <?php echo $currentPage == 'payment_history_admin.php' ? 'active' : ''; ?>"
-                        href="payment_history_admin.php?user_id=<?php echo $user_id; ?>">
+                    <a class="nav-link <?php echo $currentPage == 'payment_history.php' ? 'active' : ''; ?>"
+                        href="payment_history.php?user_id=<?php echo $user_id; ?>">
                         <div class="sb-nav-link-icon"><i class="fa-solid fa-file-lines"></i></div>
                         Payment History
                     </a>

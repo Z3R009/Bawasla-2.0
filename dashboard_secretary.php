@@ -228,37 +228,45 @@ while ($row = mysqli_fetch_assoc($result_payment_methods_count)) {
             flex-direction: column;
             justify-content: flex-start;
         }
+
         canvas {
             width: 100% !important;
             height: 320px !important;
             max-width: 100%;
             display: block;
         }
+
         @media (max-width: 991px) {
             .box {
                 min-height: 260px;
                 padding: 14px 6px;
             }
+
             canvas {
                 height: 200px !important;
             }
         }
+
         @media (max-width: 600px) {
             .box {
                 min-height: 180px;
                 padding: 8px 2px;
             }
+
             canvas {
                 height: 120px !important;
             }
         }
+
         .box:hover {
             box-shadow: 0 8px 32px rgba(44, 62, 80, 0.12), 0 2px 8px rgba(44, 62, 80, 0.08);
         }
+
         .row {
             display: flex;
             justify-content: space-between;
         }
+
         #month-select {
             width: 100%;
             padding: 10px 12px;
@@ -270,43 +278,54 @@ while ($row = mysqli_fetch_assoc($result_payment_methods_count)) {
             box-shadow: 0 1px 2px rgba(44, 62, 80, 0.04);
             transition: border 0.2s;
         }
+
         #month-select:focus {
             border: 2px solid #6c63ff;
             outline: none;
         }
+
         .card-title {
             font-size: 2rem;
             font-weight: 700;
             color: #6c63ff;
         }
+
         .card-text {
             font-size: 1rem;
             color: #7b8ca7;
         }
+
         .card.bg-dark {
             background: linear-gradient(135deg, #6c63ff 0%, #48c6ef 100%) !important;
             border-radius: 16px;
             box-shadow: 0 2px 12px rgba(44, 62, 80, 0.10);
         }
+
         .card.bg-dark .card-body {
             color: #fff;
         }
+
         /* Chart container spacing */
-        .container-fluid.px-4 > .row > .col-lg-8, 
-        .container-fluid.px-4 > .row > .col-lg-4, 
-        .container-fluid.px-4 > .row > .col-lg-12 {
+        .container-fluid.px-4>.row>.col-lg-8,
+        .container-fluid.px-4>.row>.col-lg-4,
+        .container-fluid.px-4>.row>.col-lg-12 {
             margin-bottom: 24px;
         }
+
         /* Responsive tweaks */
         @media (max-width: 991px) {
             .row {
                 flex-direction: column;
             }
-            .col-lg-8, .col-lg-4, .col-lg-12 {
+
+            .col-lg-8,
+            .col-lg-4,
+            .col-lg-12 {
                 width: 100%;
                 margin-bottom: 24px;
             }
         }
+
         .stat-card {
             background: #fff;
             border-radius: 16px;
@@ -319,88 +338,106 @@ while ($row = mysqli_fetch_assoc($result_payment_methods_count)) {
             min-height: 80px;
             transition: box-shadow 0.2s;
         }
+
         .stat-card:hover {
             box-shadow: 0 6px 24px rgba(44, 62, 80, 0.14);
         }
+
         .stat-card .stat-content {
             flex: 1;
             text-align: center;
         }
+
         .stat-card .stat-title {
             font-size: 1.1rem;
             color: #7b8ca7;
             margin-bottom: 0;
             font-weight: 500;
         }
+
         .stat-card .stat-value {
             font-size: 2.1rem;
             font-weight: 700;
             color: #2c3e50;
             margin-bottom: 0;
         }
+
         .stat-card .stat-unit {
             font-size: 1.1rem;
             color: #6c63ff;
             font-weight: 600;
         }
+
         @media (max-width: 991px) {
             .stat-card {
                 margin-bottom: 18px;
             }
         }
+
         .row.mb-4.justify-content-center {
             display: flex;
             flex-wrap: wrap;
             gap: 16px;
         }
+
         .stat-card {
             flex: 1 1 180px;
             min-width: 160px;
             max-width: 100%;
             margin-bottom: 0;
         }
+
         .col-lg-2 {
             flex: 1 1 180px;
             max-width: 220px;
             min-width: 160px;
             padding: 0 8px;
         }
+
         /* Chart containers responsive */
         .box {
             width: 100%;
             min-width: 0;
             overflow-x: auto;
         }
+
         canvas {
             width: 100% !important;
             height: auto !important;
             max-width: 100%;
         }
+
         /* Responsive tweaks */
         @media (max-width: 991px) {
             .row.mb-4.justify-content-center {
                 flex-direction: column;
                 gap: 0;
             }
+
             .col-lg-2 {
                 max-width: 100%;
                 min-width: 0;
                 padding: 0;
             }
+
             .stat-card {
                 margin-bottom: 18px;
             }
         }
+
         @media (max-width: 600px) {
             .stat-card .stat-value {
                 font-size: 1.3rem;
             }
+
             .stat-card .stat-title {
                 font-size: 0.95rem;
             }
+
             .stat-card {
                 padding: 12px 8px 12px 0;
             }
+
             .box {
                 padding: 12px 6px;
             }
@@ -436,7 +473,8 @@ while ($row = mysqli_fetch_assoc($result_payment_methods_count)) {
                             <div class="col-lg-2">
                                 <div class="stat-card">
                                     <div class="stat-content">
-                                        <div class="stat-value"><?php echo number_format($avg_usage, 2); ?> <span class="stat-unit">m³</span></div>
+                                        <div class="stat-value"><?php echo number_format($avg_usage, 2); ?> <span
+                                                class="stat-unit">m³</span></div>
                                         <div class="stat-title">Average Usage</div>
                                     </div>
                                 </div>
@@ -444,7 +482,9 @@ while ($row = mysqli_fetch_assoc($result_payment_methods_count)) {
                             <div class="col-lg-2">
                                 <div class="stat-card">
                                     <div class="stat-content">
-                                        <div class="stat-value">&#8369; <?php echo number_format($avg_consumption, 2); ?></div>
+                                        <div class="stat-value">&#8369;
+                                            <?php echo number_format($avg_consumption, 2); ?>
+                                        </div>
                                         <div class="stat-title">Average Bill</div>
                                     </div>
                                 </div>
@@ -452,7 +492,9 @@ while ($row = mysqli_fetch_assoc($result_payment_methods_count)) {
                             <div class="col-lg-2">
                                 <div class="stat-card">
                                     <div class="stat-content">
-                                        <div class="stat-value">&#8369; <?php echo number_format($total_consumption, 2); ?></div>
+                                        <div class="stat-value">&#8369;
+                                            <?php echo number_format($total_consumption, 2); ?>
+                                        </div>
                                         <div class="stat-title">Total Charges</div>
                                     </div>
                                 </div>
@@ -462,27 +504,36 @@ while ($row = mysqli_fetch_assoc($result_payment_methods_count)) {
                             <div class="col-lg-2 col-md-4 col-sm-6">
                                 <select id="month-select">
                                     <option value="select_month" disabled selected>Select Month</option>
-                                    <option value="January" <?= $selected_month == 'January' ? 'selected' : '' ?>>January</option>
-                                    <option value="February" <?= $selected_month == 'February' ? 'selected' : '' ?>>February</option>
-                                    <option value="March" <?= $selected_month == 'March' ? 'selected' : '' ?>>March</option>
-                                    <option value="April" <?= $selected_month == 'April' ? 'selected' : '' ?>>April</option>
+                                    <option value="January" <?= $selected_month == 'January' ? 'selected' : '' ?>>January
+                                    </option>
+                                    <option value="February" <?= $selected_month == 'February' ? 'selected' : '' ?>>
+                                        February</option>
+                                    <option value="March" <?= $selected_month == 'March' ? 'selected' : '' ?>>March
+                                    </option>
+                                    <option value="April" <?= $selected_month == 'April' ? 'selected' : '' ?>>April
+                                    </option>
                                     <option value="May" <?= $selected_month == 'May' ? 'selected' : '' ?>>May</option>
                                     <option value="June" <?= $selected_month == 'June' ? 'selected' : '' ?>>June</option>
                                     <option value="July" <?= $selected_month == 'July' ? 'selected' : '' ?>>July</option>
-                                    <option value="August" <?= $selected_month == 'August' ? 'selected' : '' ?>>August</option>
-                                    <option value="September" <?= $selected_month == 'September' ? 'selected' : '' ?>>September</option>
-                                    <option value="October" <?= $selected_month == 'October' ? 'selected' : '' ?>>October</option>
-                                    <option value="November" <?= $selected_month == 'November' ? 'selected' : '' ?>>November</option>
-                                    <option value="December" <?= $selected_month == 'December' ? 'selected' : '' ?>>December</option>
+                                    <option value="August" <?= $selected_month == 'August' ? 'selected' : '' ?>>August
+                                    </option>
+                                    <option value="September" <?= $selected_month == 'September' ? 'selected' : '' ?>>
+                                        September</option>
+                                    <option value="October" <?= $selected_month == 'October' ? 'selected' : '' ?>>October
+                                    </option>
+                                    <option value="November" <?= $selected_month == 'November' ? 'selected' : '' ?>>
+                                        November</option>
+                                    <option value="December" <?= $selected_month == 'December' ? 'selected' : '' ?>>
+                                        December</option>
                                 </select>
                             </div>
                         </div>
 
-                            <div class="container-fluid px-4">
-                                <div class="row">
+                        <div class="container-fluid px-4">
+                            <div class="row">
                                 <div class="col-12 mb-4">
-                                        <div class="box">
-                                            <h6>Total Charges per Purok</h6>
+                                    <div class="box">
+                                        <h6>Total Charges per Purok</h6>
                                         <canvas id="chargesChart"></canvas>
                                     </div>
                                 </div>
@@ -492,30 +543,30 @@ while ($row = mysqli_fetch_assoc($result_payment_methods_count)) {
                         <div class="container-fluid px-4">
                             <div class="row">
                                 <div class="col-12 mb-4">
-                                        <div class="box">
+                                    <div class="box">
                                         <h6>Monthly Charges</h6>
                                         <canvas id="monthlyChargesChart"></canvas>
                                     </div>
-                                    </div>
                                 </div>
                             </div>
+                        </div>
 
-                            <div class="container-fluid px-4">
-                                <div class="row">
+                        <div class="container-fluid px-4">
+                            <div class="row">
                                 <div class="col-12 mb-4">
-                                        <div class="box">
+                                    <div class="box">
                                         <h6>Payment Method Used</h6>
                                         <canvas id="paymentMethodChart"></canvas>
                                     </div>
-                                    </div>
                                 </div>
                             </div>
+                        </div>
 
-                            <div class="container-fluid px-4">
-                                <div class="row">
+                        <div class="container-fluid px-4">
+                            <div class="row">
                                 <div class="col-12 mb-4">
-                                        <div class="box">
-                                            <h6>Payment Methods by Purok (G-Cash vs Walk-in)</h6>
+                                    <div class="box">
+                                        <h6>Payment Methods by Purok (G-Cash vs Walk-in)</h6>
                                         <canvas id="paymentChart"></canvas>
                                     </div>
                                 </div>
@@ -616,9 +667,9 @@ while ($row = mysqli_fetch_assoc($result_payment_methods_count)) {
                 datasets: [{
                     label: 'Total Charges per Purok',
                     data: currentCharges,
-                    backgroundColor: function(context) {
+                    backgroundColor: function (context) {
                         const chart = context.chart;
-                        const {ctx, chartArea} = chart;
+                        const { ctx, chartArea } = chart;
                         if (!chartArea) return modernColors[0];
                         return getGradient(ctx, chartArea, '#6c63ff', '#48c6ef');
                     },
@@ -634,26 +685,26 @@ while ($row = mysqli_fetch_assoc($result_payment_methods_count)) {
                         display: false
                     },
                     datalabels: {
-                        align: function(context) {
+                        align: function (context) {
                             var value = context.dataset.data[context.dataIndex];
                             var scales = context.chart.scales;
                             var max = (scales['y-axis-0'] || scales['y']).max;
                             return value >= 0.6 * max ? 'center' : 'end';
                         },
-                        anchor: function(context) {
+                        anchor: function (context) {
                             var value = context.dataset.data[context.dataIndex];
                             var scales = context.chart.scales;
                             var max = (scales['y-axis-0'] || scales['y']).max;
                             return value >= 0.6 * max ? 'center' : 'end';
                         },
-                        color: function(context) {
+                        color: function (context) {
                             var value = context.dataset.data[context.dataIndex];
                             var scales = context.chart.scales;
                             var max = (scales['y-axis-0'] || scales['y']).max;
                             return value >= 0.6 * max ? '#fff' : '#2c3e50';
                         },
                         font: { weight: 'bold', size: 12 },
-                        backgroundColor: function(context) {
+                        backgroundColor: function (context) {
                             var value = context.dataset.data[context.dataIndex];
                             var scales = context.chart.scales;
                             var max = (scales['y-axis-0'] || scales['y']).max;
@@ -663,10 +714,10 @@ while ($row = mysqli_fetch_assoc($result_payment_methods_count)) {
                         padding: 2,
                         clamp: true,
                         clip: true,
-                        display: function(context) {
+                        display: function (context) {
                             return context.dataset.data[context.dataIndex] > 0;
                         },
-                        formatter: function(value) { return '₱' + value.toLocaleString(); }
+                        formatter: function (value) { return '₱' + value.toLocaleString(); }
                     },
                     tooltip: {
                         backgroundColor: '#fff',
@@ -677,7 +728,7 @@ while ($row = mysqli_fetch_assoc($result_payment_methods_count)) {
                         padding: 12,
                         displayColors: false,
                         callbacks: {
-                            label: function(context) {
+                            label: function (context) {
                                 return '₱' + context.parsed.y.toLocaleString();
                             }
                         }
@@ -734,7 +785,7 @@ while ($row = mysqli_fetch_assoc($result_payment_methods_count)) {
                         padding: 2,
                         clamp: true,
                         clip: true,
-                        formatter: function(value, ctx) {
+                        formatter: function (value, ctx) {
                             let sum = ctx.chart.data.datasets[0].data.reduce((a, b) => a + b, 0);
                             let percentage = (value * 100 / sum).toFixed(1) + '%';
                             return percentage;
@@ -749,7 +800,7 @@ while ($row = mysqli_fetch_assoc($result_payment_methods_count)) {
                         padding: 12,
                         displayColors: false,
                         callbacks: {
-                            label: function(context) {
+                            label: function (context) {
                                 return context.label + ': ' + context.parsed + ' members';
                             }
                         }
@@ -773,9 +824,9 @@ while ($row = mysqli_fetch_assoc($result_payment_methods_count)) {
                     label: 'Total Charges per Month',
                     data: totalCharges,
                     borderColor: '#6c63ff',
-                    backgroundColor: function(context) {
+                    backgroundColor: function (context) {
                         const chart = context.chart;
-                        const {ctx, chartArea} = chart;
+                        const { ctx, chartArea } = chart;
                         if (!chartArea) return '#6c63ff';
                         return getGradient(ctx, chartArea, 'rgba(76,99,255,0.3)', 'rgba(72,198,239,0.1)');
                     },
@@ -795,26 +846,26 @@ while ($row = mysqli_fetch_assoc($result_payment_methods_count)) {
                         display: false
                     },
                     datalabels: {
-                        align: function(context) {
+                        align: function (context) {
                             var value = context.dataset.data[context.dataIndex];
                             var scales = context.chart.scales;
                             var max = (scales['y-axis-0'] || scales['y']).max;
                             return value >= 0.6 * max ? 'center' : 'end';
                         },
-                        anchor: function(context) {
+                        anchor: function (context) {
                             var value = context.dataset.data[context.dataIndex];
                             var scales = context.chart.scales;
                             var max = (scales['y-axis-0'] || scales['y']).max;
                             return value >= 0.6 * max ? 'center' : 'end';
                         },
-                        color: function(context) {
+                        color: function (context) {
                             var value = context.dataset.data[context.dataIndex];
                             var scales = context.chart.scales;
                             var max = (scales['y-axis-0'] || scales['y']).max;
                             return value >= 0.6 * max ? '#fff' : '#6c63ff';
                         },
                         font: { weight: 'bold', size: 13 },
-                        backgroundColor: function(context) {
+                        backgroundColor: function (context) {
                             var value = context.dataset.data[context.dataIndex];
                             var scales = context.chart.scales;
                             var max = (scales['y-axis-0'] || scales['y']).max;
@@ -824,10 +875,10 @@ while ($row = mysqli_fetch_assoc($result_payment_methods_count)) {
                         padding: 2,
                         clamp: true,
                         clip: true,
-                        display: function(context) {
+                        display: function (context) {
                             return context.dataset.data[context.dataIndex] > 0;
                         },
-                        formatter: function(value) { return '₱' + value.toLocaleString(); }
+                        formatter: function (value) { return '₱' + value.toLocaleString(); }
                     },
                     tooltip: {
                         backgroundColor: '#fff',
@@ -838,7 +889,7 @@ while ($row = mysqli_fetch_assoc($result_payment_methods_count)) {
                         padding: 12,
                         displayColors: false,
                         callbacks: {
-                            label: function(context) {
+                            label: function (context) {
                                 return '₱' + context.parsed.y.toLocaleString();
                             }
                         }
@@ -910,26 +961,26 @@ while ($row = mysqli_fetch_assoc($result_payment_methods_count)) {
                         }
                     },
                     datalabels: {
-                        align: function(context) {
+                        align: function (context) {
                             var value = context.dataset.data[context.dataIndex];
                             var scales = context.chart.scales;
                             var max = (scales['y-axis-0'] || scales['y']).max;
                             return value >= 0.6 * max ? 'center' : 'end';
                         },
-                        anchor: function(context) {
+                        anchor: function (context) {
                             var value = context.dataset.data[context.dataIndex];
                             var scales = context.chart.scales;
                             var max = (scales['y-axis-0'] || scales['y']).max;
                             return value >= 0.6 * max ? 'center' : 'end';
                         },
-                        color: function(context) {
+                        color: function (context) {
                             var value = context.dataset.data[context.dataIndex];
                             var scales = context.chart.scales;
                             var max = (scales['y-axis-0'] || scales['y']).max;
                             return value >= 0.6 * max ? '#fff' : '#2c3e50';
                         },
                         font: { weight: 'bold', size: 13 },
-                        backgroundColor: function(context) {
+                        backgroundColor: function (context) {
                             var value = context.dataset.data[context.dataIndex];
                             var scales = context.chart.scales;
                             var max = (scales['y-axis-0'] || scales['y']).max;
@@ -939,10 +990,10 @@ while ($row = mysqli_fetch_assoc($result_payment_methods_count)) {
                         padding: 2,
                         clamp: true,
                         clip: true,
-                        display: function(context) {
+                        display: function (context) {
                             return context.dataset.data[context.dataIndex] > 0;
                         },
-                        formatter: function(value) { return value; }
+                        formatter: function (value) { return value; }
                     }
                 },
                 scales: {
@@ -960,17 +1011,17 @@ while ($row = mysqli_fetch_assoc($result_payment_methods_count)) {
                 animation: {
                     duration: 1200,
                     easing: 'easeOutQuart',
-                    onComplete: function(animation) {
+                    onComplete: function (animation) {
                         var chart = animation.chart || paymentChart;
                         var chartArea = chart.chartArea;
-                        chart.data.datasets[0].backgroundColor = function(context) {
+                        chart.data.datasets[0].backgroundColor = function (context) {
                             var chart = context.chart || context._chart;
                             var ctx = chart.ctx;
                             var chartArea = chart.chartArea;
                             if (!chartArea) return 'rgba(76,99,255,1)';
                             return getGcashGradient(ctx, chartArea);
                         };
-                        chart.data.datasets[1].backgroundColor = function(context) {
+                        chart.data.datasets[1].backgroundColor = function (context) {
                             var chart = context.chart || context._chart;
                             var ctx = chart.ctx;
                             var chartArea = chart.chartArea;
@@ -988,7 +1039,7 @@ while ($row = mysqli_fetch_assoc($result_payment_methods_count)) {
     <script>
         document.getElementById("month-select").addEventListener("change", function () {
             var selectedMonth = this.value;
-            window.location.href = "dashboard_admin.php?month=" + selectedMonth;
+            window.location.href = "dashboard_secretary.php?month=" + selectedMonth;
         });
     </script>
 

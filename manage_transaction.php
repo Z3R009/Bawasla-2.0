@@ -137,8 +137,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 <body class="sb-nav-fixed">
 
     <div id="layoutSidenav">
-        <?php include "Includes/header_treasurer.php"; ?>
-        <?php include "Includes/sidebar_treasurer.php"; ?>
+        <?php include "Includes/header_admin.php"; ?>
+        <?php include "Includes/sidebar_admin.php"; ?>
         <div id="layoutSidenav_content">
             <main>
                 <div class="container-fluid px-4">
@@ -205,13 +205,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                                                     data-bs-target="#paymentModal"
                                                     data-memberid="<?php echo htmlspecialchars($row['member_id']); ?>"
                                                     data-readingid="<?php echo htmlspecialchars($row['reading_id']); ?>"
-                                                    data-readingdate="<?php echo htmlspecialchars($row['reading_date']); ?>"
                                                     data-fullname="<?php echo htmlspecialchars($row['fullname']); ?>"
                                                     data-address="<?php echo htmlspecialchars($row['address']); ?>"
-                                                    data-tankno="<?php echo htmlspecialchars($row['tank_no']); ?>"
-                                                    data-meterno="<?php echo htmlspecialchars($row['meter_no']); ?>"
-                                                    data-duedate="<?php echo htmlspecialchars($row['due_date']); ?>"
-                                                    data-disconnectiondate="<?php echo htmlspecialchars($row['disconnection_date']); ?>"
                                                     data-current_charges="<?php echo htmlspecialchars($row['current_charges']); ?>"
                                                     data-total_amount_due="<?php echo htmlspecialchars($row['total_amount_due']); ?>"
                                                     data-billing_month="<?php echo htmlspecialchars($row['billing_month']); ?>">
@@ -251,44 +246,25 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                                                 <label for="fullname" class="form-label">Full Name</label>
                                                 <input type="text" class="form-control" id="edit_fullname"
                                                     name="fullname" readonly>
+
+                                                <input type="text" id="edit_address" name="address">
                                             </div>
                                             <div class="row">
-                                                <div class="col-md-4 mb-3">
-                                                    <label for="tank_no" class="form-label">Tank Number</label>
-                                                    <input type="text" class="form-control" id="edit_tank_no"
-                                                        name="tank_no" readonly>
-                                                </div>
-                                                <div class="col-md-4 mb-3">
-                                                    <label for="meter_no" class="form-label">Meter Number</label>
-                                                    <input type="text" class="form-control" id="edit_meter_no"
-                                                        name="meter_no" readonly>
-                                                </div>
-                                                <div class="col-md-4 mb-3">
-                                                    <label for="address" class="form-label">Address</label>
-                                                    <input type="text" class="form-control" id="edit_address"
-                                                        name="address" readonly>
-                                                </div>
-                                            </div>
-                                            <div class="row">
-                                                <div class="col-md-4 mb-3">
-                                                    <label for="reading_date" class="form-label">Reading Date</label>
-                                                    <input type="text" class="form-control" id="edit_reading_date"
-                                                        name="reading_date" readonly>
-                                                </div>
-                                                <div class="col-md-4 mb-3">
-                                                    <label for="due_date" class="form-label">Due Date</label>
-                                                    <input type="text" class="form-control" id="edit_due_date"
-                                                        name="due_date" readonly>
-                                                </div>
-                                                <div class="col-md-4 mb-3">
-                                                    <label for="disconnection_date" class="form-label">Disconnection
-                                                        Date</label>
-                                                    <input type="text" class="form-control" id="edit_disconnection_date"
-                                                        name="disconnection_date" readonly>
+                                                <div class="col-md-6 mb-3">
+                                                    <div class="form-check">
+                                                        <input class="form-check-input" type="checkbox"
+                                                            id="senior_discount" name="senior_discount" value="1">
+                                                        <label class="form-check-label" for="senior_discount">
+                                                            Apply Senior Citizen Discount
+                                                        </label>
+                                                    </div>
                                                 </div>
                                             </div>
                                             <!-- <hr style="border: none; height: 5px; background-color: #000;"> -->
                                             <div class="row">
+
+
+
                                                 <div class="col-md-6 mb-3">
                                                     <label for="amount_paid" class="form-label">Cash</label>
                                                     <input type="number" style="border: 2px solid #000;"
@@ -355,13 +331,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             var button = event.relatedTarget; // Button that triggered the modal
             var memberId = button.getAttribute('data-memberid');
             var readingId = button.getAttribute('data-readingid');
-            var readingDate = button.getAttribute('data-readingdate');
             var fullname = button.getAttribute('data-fullname');
             var address = button.getAttribute('data-address');
-            var tankNo = button.getAttribute('data-tankno');
-            var meterNo = button.getAttribute('data-meterno');
-            var dueDate = button.getAttribute('data-duedate');
-            var disconnectionDate = button.getAttribute('data-disconnectiondate');
             var currentCharges = button.getAttribute('data-current_charges');
             var totalBill = button.getAttribute('data-total_amount_due');
             var billing_month = button.getAttribute('data-billing_month');
@@ -369,14 +340,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             // Populate the fields in the modal
             document.getElementById('edit_member_id').value = memberId;
             document.getElementById('edit_reading_id').value = readingId;
-            document.getElementById('edit_reading_date').value = readingDate;
             document.getElementById('edit_fullname').value = fullname;
             document.getElementById('edit_address').value = address;
-            document.getElementById('edit_tank_no').value = tankNo;
-            document.getElementById('edit_meter_no').value = meterNo;
-            document.getElementById('edit_due_date').value = dueDate;
             document.getElementById('edit_current_charges').value = currentCharges;
-            document.getElementById('edit_disconnection_date').value = disconnectionDate;
             document.getElementById('edit_total_amount_due').value = totalBill; // Format to 2 decimal places
             document.getElementById('edit_billing_month').value = billing_month;
         });
@@ -411,6 +377,59 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             document.getElementById('arrears_amount').value = '0.00'; // Reset arrears field to 0.00
         });
     </script>
+
+    <!-- discount -->
+    <script>
+        let originalTotalAmount = 0; // to store the original amount before discount
+
+        // Capture and store original total amount when modal is shown
+        paymentModal.addEventListener('show.bs.modal', function (event) {
+            var totalBill = parseFloat(event.relatedTarget.getAttribute('data-total_amount_due'));
+            originalTotalAmount = totalBill;
+            document.getElementById('edit_total_amount_due').value = totalBill.toFixed(2);
+        });
+
+        // Apply discount when checkbox is clicked
+        document.getElementById('senior_discount').addEventListener('change', function () {
+            let discountCheckbox = this;
+            let totalAmountField = document.getElementById('edit_total_amount_due');
+
+            if (discountCheckbox.checked) {
+                let discounted = originalTotalAmount * 0.95;
+                totalAmountField.value = discounted.toFixed(2);
+            } else {
+                totalAmountField.value = originalTotalAmount.toFixed(2);
+            }
+
+            // Recalculate change and arrears
+            recalculatePayment();
+        });
+
+        // Recalculate when amount paid changes
+        document.getElementById('amount_paid').addEventListener('input', recalculatePayment);
+
+        function recalculatePayment() {
+            let totalBill = parseFloat(document.getElementById('edit_total_amount_due').value);
+            let amountPaid = parseFloat(document.getElementById('amount_paid').value);
+            let changeField = document.getElementById('change');
+            let arrearsField = document.getElementById('arrears_amount');
+
+            if (isNaN(totalBill) || isNaN(amountPaid)) {
+                changeField.value = '0.00';
+                arrearsField.value = '0.00';
+                return;
+            }
+
+            if (amountPaid >= totalBill) {
+                changeField.value = (amountPaid - totalBill).toFixed(2);
+                arrearsField.value = '0.00';
+            } else {
+                changeField.value = '0.00';
+                arrearsField.value = (totalBill - amountPaid).toFixed(2);
+            }
+        }
+    </script>
+
 
 
 </body>
