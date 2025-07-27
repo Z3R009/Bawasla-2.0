@@ -19,6 +19,7 @@ $select = mysqli_query($connection, "
         members.address, 
         meter_reading.current_charges,
         meter_reading.reading_id,
+        meter_reading.total_usage,
         meter_reading.member_id,
         meter_reading.due_date,
         meter_reading.disconnection_date,
@@ -39,6 +40,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $transaction_id = $_POST['transaction_id'];
     $member_id = $_POST['member_id'];
     $reading_id = $_POST['reading_id'];
+    $total_usage = $_POST['total_usage'];
     $fullname = $_POST['fullname'];
     $reading_date = $_POST['reading_date'];
     $due_date = $_POST['due_date'];
@@ -52,8 +54,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $total_amount_due = $_POST['total_amount_due'];
 
     // Insert into 'history' table
-    $sql_history = "INSERT INTO history (transaction_id, member_id, reading_id, fullname, reading_date, due_date, disconnection_date, current_charges, total_amount_due, amount_paid, billing_month, payment_method) 
-    VALUES ('$transaction_id', '$member_id', '$reading_id', '$fullname', '$reading_date', '$due_date', '$disconnection_date',  '$current_charges', '$total_amount_due', '$amount_paid', '$billing_month', '$payment_method')";
+    $sql_history = "INSERT INTO history (transaction_id, member_id, reading_id, total_usage, fullname, reading_date, due_date, disconnection_date, current_charges, total_amount_due, amount_paid, billing_month, payment_method) 
+    VALUES ('$transaction_id', '$member_id', '$reading_id', '$total_usage', '$fullname', '$reading_date', '$due_date', '$disconnection_date',  '$current_charges', '$total_amount_due', '$amount_paid', '$billing_month', '$payment_method')";
 
     if ($connection->query($sql_history)) {
 
@@ -76,7 +78,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             // Update members table isDone field to "Not Done"
             $sql_update_isDone = "UPDATE members SET isDone = 'Not Done' WHERE member_id = '$member_id'";
             if ($connection->query($sql_update_isDone)) {
-                header("Location: receipt.php?transaction_id=$transaction_id");
+                header("Location: manage_transaction.php");
                 exit();
             } else {
                 echo "Error updating isDone: " . $connection->error;
@@ -157,6 +159,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                                         <th>Details</th>
                                         <th>Date</th>
                                         <th>Current Charges</th>
+                                        <th>Total Usage</th>
                                         <th>Arrears</th>
                                         <th>Total Amount Due</th>
                                         <th>Billing Month</th>
@@ -197,6 +200,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                                                     ?></span>
                                             </td>
                                             <td><?php echo htmlspecialchars($row['current_charges']); ?></td>
+                                            <td><?php echo htmlspecialchars($row['total_usage']); ?></td>
                                             <td><?php echo htmlspecialchars($row['arrears_amount']); ?></td>
                                             <td><?php echo htmlspecialchars($row['total_amount_due']); ?></td>
                                             <td><?php echo htmlspecialchars($row['billing_month']); ?></td>
@@ -205,7 +209,13 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                                                     data-bs-target="#paymentModal"
                                                     data-memberid="<?php echo htmlspecialchars($row['member_id']); ?>"
                                                     data-readingid="<?php echo htmlspecialchars($row['reading_id']); ?>"
+                                                    data-totalusage="<?php echo htmlspecialchars($row['total_usage']); ?>"
+                                                    data-readingdate="<?php echo htmlspecialchars($row['reading_date']); ?>"
                                                     data-fullname="<?php echo htmlspecialchars($row['fullname']); ?>"
+                                                    data-tankno="<?php echo htmlspecialchars($row['tank_no']); ?>"
+                                                    data-meterno="<?php echo htmlspecialchars($row['meter_no']); ?>"
+                                                    data-duedate="<?php echo htmlspecialchars($row['due_date']); ?>"
+                                                    data-disconnectiondate="<?php echo htmlspecialchars($row['disconnection_date']); ?>"
                                                     data-address="<?php echo htmlspecialchars($row['address']); ?>"
                                                     data-current_charges="<?php echo htmlspecialchars($row['current_charges']); ?>"
                                                     data-total_amount_due="<?php echo htmlspecialchars($row['total_amount_due']); ?>"
@@ -223,7 +233,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
                     <!-- pay -->
                     <div class="modal fade" id="paymentModal" tabindex="-1" aria-labelledby="exampleModalLabel"
-                        aria-hidden="true">
+                        aria-text="true">
                         <div class="modal-dialog modal-lg-custom">
                             <div class="modal-dialog">
                                 <div class="modal-content">
@@ -242,13 +252,13 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                                                 name="member_id" readonly>
                                             <input type="hidden" class="form-control" id="edit_reading_id"
                                                 name="reading_id" readonly>
+                                            <input type="hidden" id="edit_total_usage" name="total_usage">
                                             <div class="mb-3">
                                                 <label for="fullname" class="form-label">Full Name</label>
                                                 <input type="text" class="form-control" id="edit_fullname"
                                                     name="fullname" readonly>
-
-                                                <input type="text" id="edit_address" name="address">
                                             </div>
+
                                             <div class="row">
                                                 <div class="col-md-6 mb-3">
                                                     <div class="form-check">
@@ -260,11 +270,52 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                                                     </div>
                                                 </div>
                                             </div>
+
+                                            <div class="mb-3">
+                                                <label for="or_number" class="form-label">OR Number</label>
+                                                <input type="number" style="border: 2px solid #000;"
+                                                    class="form-control" name="or_number" id="or_number"
+                                                    placeholder="Input OR Number" required>
+
+                                            </div>
+
+                                            <div class="row">
+                                                <div class="col-md-4 mb-3">
+                                                    <!-- <label for="tank_no" class="form-label">Tank Number</label> -->
+                                                    <input type="hidden" class="form-control" id="edit_tank_no"
+                                                        name="tank_no" readonly>
+                                                </div>
+                                                <div class="col-md-4 mb-3">
+                                                    <!-- <label for="meter_no" class="form-label">Meter Number</label> -->
+                                                    <input type="hidden" class="form-control" id="edit_meter_no"
+                                                        name="meter_no" readonly>
+                                                </div>
+                                                <div class="col-md-4 mb-3">
+                                                    <!-- <label for="address" class="form-label">Address</label> -->
+                                                    <input type="hidden" class="form-control" id="edit_address"
+                                                        name="address" readonly>
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-md-4 mb-3">
+                                                    <!-- <label for="reading_date" class="form-label">Reading Date</label> -->
+                                                    <input type="hidden" class="form-control" id="edit_reading_date"
+                                                        name="reading_date" readonly>
+                                                </div>
+                                                <div class="col-md-4 mb-3">
+                                                    <!-- <label for="due_date" class="form-label">Due Date</label> -->
+                                                    <input type="hidden" class="form-control" id="edit_due_date"
+                                                        name="due_date" readonly>
+                                                </div>
+                                                <div class="col-md-4 mb-3">
+                                                    <!-- <label for="disconnection_date" class="form-label">Disconnection
+                                                        Date</label> -->
+                                                    <input type="hidden" class="form-control"
+                                                        id="edit_disconnection_date" name="disconnection_date" readonly>
+                                                </div>
+                                            </div>
                                             <!-- <hr style="border: none; height: 5px; background-color: #000;"> -->
                                             <div class="row">
-
-
-
                                                 <div class="col-md-6 mb-3">
                                                     <label for="amount_paid" class="form-label">Cash</label>
                                                     <input type="number" style="border: 2px solid #000;"
@@ -331,8 +382,14 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             var button = event.relatedTarget; // Button that triggered the modal
             var memberId = button.getAttribute('data-memberid');
             var readingId = button.getAttribute('data-readingid');
+            var totalUsage = button.getAttribute('data-totalusage');
+            var readingDate = button.getAttribute('data-readingdate');
             var fullname = button.getAttribute('data-fullname');
             var address = button.getAttribute('data-address');
+            var tankNo = button.getAttribute('data-tankno');
+            var meterNo = button.getAttribute('data-meterno');
+            var dueDate = button.getAttribute('data-duedate');
+            var disconnectionDate = button.getAttribute('data-disconnectiondate');
             var currentCharges = button.getAttribute('data-current_charges');
             var totalBill = button.getAttribute('data-total_amount_due');
             var billing_month = button.getAttribute('data-billing_month');
@@ -340,9 +397,15 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             // Populate the fields in the modal
             document.getElementById('edit_member_id').value = memberId;
             document.getElementById('edit_reading_id').value = readingId;
+            document.getElementById('edit_reading_date').value = readingDate;
+            document.getElementById('edit_total_usage').value = totalUsage;
             document.getElementById('edit_fullname').value = fullname;
             document.getElementById('edit_address').value = address;
+            document.getElementById('edit_tank_no').value = tankNo;
+            document.getElementById('edit_meter_no').value = meterNo;
+            document.getElementById('edit_due_date').value = dueDate;
             document.getElementById('edit_current_charges').value = currentCharges;
+            document.getElementById('edit_disconnection_date').value = disconnectionDate;
             document.getElementById('edit_total_amount_due').value = totalBill; // Format to 2 decimal places
             document.getElementById('edit_billing_month').value = billing_month;
         });
@@ -377,6 +440,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             document.getElementById('arrears_amount').value = '0.00'; // Reset arrears field to 0.00
         });
     </script>
+
 
     <!-- discount -->
     <script>
@@ -429,8 +493,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             }
         }
     </script>
-
-
 
 </body>
 
