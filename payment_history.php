@@ -83,12 +83,13 @@ if (!$select) {
                                         <th>Member ID</th>
                                         <th>Reading ID</th>
                                         <th>Fullname</th>
+                                        <th>OR Number</th>
                                         <th>Date</th>
                                         <th>Current Charges</th>
+                                        <th>Discount</th>
                                         <th>Total Amount Due</th>
                                         <th>Amount Paid</th>
                                         <th>Billing Month</th>
-                                        <th>Payment Method</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -98,6 +99,7 @@ if (!$select) {
                                             <td><?php echo htmlspecialchars($row['reading_id']); ?></td>
 
                                             <td><?php echo htmlspecialchars($row['fullname']); ?></td>
+                                            <td><?php echo htmlspecialchars($row['or_number']); ?></td>
                                             <td>
                                                 <span id="reading_date_<?php echo $member_id; ?>">
                                                     Reading Date: <?php
@@ -126,11 +128,11 @@ if (!$select) {
                                                 </span>
                                             </td>
                                             <td><?php echo htmlspecialchars($row['current_charges']); ?></td>
+                                            <td><?php echo htmlspecialchars($row['discount']); ?></td>
                                             <td><?php echo htmlspecialchars($row['total_amount_due']); ?></td>
                                             <td><?php echo htmlspecialchars($row['amount_paid']); ?></td>
 
                                             <td><?php echo htmlspecialchars($row['billing_month']); ?></td>
-                                            <td><?php echo htmlspecialchars($row['payment_method']); ?></td>
 
                                         </tr>
                                     <?php } ?>

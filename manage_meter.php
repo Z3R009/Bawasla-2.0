@@ -248,7 +248,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                                         <label for="total_usage" class="form-label">Total Usage</label>
                                         <input type="number" style="border: 2px solid #000;" class="form-control"
                                             id="total_usage" name="total_usage" placeholder="Enter Total Usage"
-                                            oninput="calculateTotalBill()" required>
+                                            oninput="calculateTotalBill()" autocomplete="off" required>
                                     </div>
                                     <div class="mb-3">
                                         <label for="current_charges" class="form-label">Current Charges</label>

@@ -42,9 +42,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $reading_id = $_POST['reading_id'];
     $total_usage = $_POST['total_usage'];
     $fullname = $_POST['fullname'];
+    $or_number = $_POST['or_number'];
     $reading_date = $_POST['reading_date'];
     $due_date = $_POST['due_date'];
     $disconnection_date = $_POST['disconnection_date'];
+    $discount = $_POST['discount'];
     $current_charges = $_POST['current_charges'];
     $amount_paid = $_POST['amount_paid'];
     $billing_month = $_POST['billing_month'];
@@ -54,8 +56,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $total_amount_due = $_POST['total_amount_due'];
 
     // Insert into 'history' table
-    $sql_history = "INSERT INTO history (transaction_id, member_id, reading_id, total_usage, fullname, reading_date, due_date, disconnection_date, current_charges, total_amount_due, amount_paid, billing_month, payment_method) 
-    VALUES ('$transaction_id', '$member_id', '$reading_id', '$total_usage', '$fullname', '$reading_date', '$due_date', '$disconnection_date',  '$current_charges', '$total_amount_due', '$amount_paid', '$billing_month', '$payment_method')";
+    $sql_history = "INSERT INTO history (transaction_id, member_id, reading_id, total_usage, fullname, or_number, reading_date, due_date, discount, disconnection_date, current_charges, total_amount_due, amount_paid, billing_month, payment_method) 
+    VALUES ('$transaction_id', '$member_id', '$reading_id', '$total_usage', '$fullname', '$or_number', '$reading_date', '$due_date', '$discount', '$disconnection_date',  '$current_charges', '$total_amount_due', '$amount_paid', '$billing_month', '$payment_method')";
 
     if ($connection->query($sql_history)) {
 
@@ -263,13 +265,18 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                                                 <div class="col-md-6 mb-3">
                                                     <div class="form-check">
                                                         <input class="form-check-input" type="checkbox"
-                                                            id="senior_discount" name="senior_discount" value="1">
+                                                            id="senior_discount" name="senior_discount" value="1"
+                                                            onchange="toggleDiscountText()">
                                                         <label class="form-check-label" for="senior_discount">
                                                             Apply Senior Citizen Discount
                                                         </label>
                                                     </div>
                                                 </div>
                                             </div>
+
+
+                                            <input type="text" id="discount_text" class="form-control" name="discount"
+                                                readonly value="None">
 
                                             <div class="mb-3">
                                                 <label for="or_number" class="form-label">OR Number</label>
@@ -491,6 +498,15 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 changeField.value = '0.00';
                 arrearsField.value = (totalBill - amountPaid).toFixed(2);
             }
+        }
+    </script>
+
+    <!-- discount text -->
+    <script>
+        function toggleDiscountText() {
+            const checkbox = document.getElementById('senior_discount');
+            const discountText = document.getElementById('discount_text');
+            discountText.value = checkbox.checked ? "Senior Citizen Discount" : "None";
         }
     </script>
 
