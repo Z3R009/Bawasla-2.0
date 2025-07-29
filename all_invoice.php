@@ -151,8 +151,8 @@ if (isset($_GET['member_id'])) {
 <body class="sb-nav-fixed">
 
     <div id="layoutSidenav">
-        <?php include "Includes/header_treasurer.php"; ?>
-        <?php include "Includes/sidebar_treasurer.php"; ?>
+        <?php include "Includes/header_admin.php"; ?>
+        <?php include "Includes/sidebar_admin.php"; ?>
         <div id="layoutSidenav_content">
             <main>
                 <div class="container-fluid px-4">

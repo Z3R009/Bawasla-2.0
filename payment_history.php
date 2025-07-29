@@ -22,7 +22,14 @@ if (isset($_SESSION['user_id'])) {
 }
 
 // retrieve
-$select = mysqli_query($connection, "SELECT * FROM history ORDER BY payment_date DESC");
+$month_filter = "";
+if (isset($_GET['month']) && $_GET['month'] !== "") {
+    $selected_month = $_GET['month'];
+    $month_filter = "WHERE DATE_FORMAT(payment_date, '%Y-%m') = '$selected_month'";
+}
+
+$select = mysqli_query($connection, "SELECT * FROM history $month_filter ORDER BY payment_date DESC");
+
 
 // Check for errors in the SQL query
 if (!$select) {
@@ -68,8 +75,62 @@ if (!$select) {
                         Payment History
                     </h1>
 
+                    <!-- <ul class="nav nav-tabs">
+                        <li class="nav-item">
+                            <a class="nav-link active" aria-current="page" href="#">Active</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#">Link</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#">Link</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link disabled" aria-disabled="true">Disabled</a>
+                        </li>
+                    </ul> -->
 
-                    </ol>
+                    <br>
+
+                    <?php
+                    // Re-run query to calculate total amount paid for the selected month
+                    $total_query = mysqli_query($connection, "SELECT SUM(amount_paid) AS total_paid FROM history $month_filter");
+                    $total_row = mysqli_fetch_assoc($total_query);
+                    $total_paid = $total_row['total_paid'] ?? 0;
+                    ?>
+
+                    <!-- Container to hold month select and total amount -->
+                    <div class="d-flex justify-content-between align-items-center mb-3"
+                        style="gap: 20px; flex-wrap: wrap;">
+                        <!-- Month Select Form -->
+                        <form method="GET" class="d-flex align-items-center">
+                            <label for="month" class="me-2 mb-0">Select Month:</label>
+                            <select name="month" id="month" class="form-select" onchange="this.form.submit()"
+                                style="width: 250px;">
+                                <option value="">-- All Months --</option>
+                                <?php
+                                $currentYear = date("Y");
+                                $years = [$currentYear]; // Add more years if needed
+                                foreach ($years as $year) {
+                                    for ($m = 1; $m <= 12; $m++) {
+                                        $month_value = sprintf('%d-%02d', $year, $m);
+                                        $month_name = date("F", mktime(0, 0, 0, $m, 1));
+                                        $selected = (isset($_GET['month']) && $_GET['month'] === $month_value) ? 'selected' : '';
+                                        echo "<option value='$month_value' $selected>$month_name $year</option>";
+                                    }
+                                }
+                                ?>
+                            </select>
+                        </form>
+
+                        <!-- Total Amount Paid Display -->
+                        <div class="fw-bold text-end" style="min-width: 250px;">
+                            Total Amount Paid: ₱<?php echo number_format($total_paid, 2); ?>
+                        </div>
+                    </div>
+
+
+
                     <div class="card mb-4">
                         <div class="card-body">
                             <table id="datatablesSimple" class="table table-bordered table-hover">
@@ -132,8 +193,10 @@ if (!$select) {
                                         </tr>
                                     <?php } ?>
                                 </tbody>
+
                             </table>
                         </div>
+
                     </div>
 
                 </div>
