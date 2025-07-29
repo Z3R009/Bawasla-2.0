@@ -56,6 +56,12 @@ $currentPage = basename($_SERVER['PHP_SELF']);
                         Manage Transaction
                     </a>
 
+                    <a class="nav-link <?php echo $currentPage == 'manage_invoice.php' ? 'active' : ''; ?>"
+                        href="manage_invoice.php?user_id=<?php echo $user_id; ?>">
+                        <div class="sb-nav-link-icon"><i class="fa-solid fa-file-lines"></i></div>
+                        Manage Invoice
+                    </a>
+
                     <a class="nav-link <?php echo $currentPage == 'reports_admin.php' ? 'active' : ''; ?>"
                         href="reports_admin.php?user_id=<?php echo $user_id; ?>">
                         <div class="sb-nav-link-icon"><i class="fa-solid fa-file-lines"></i></div>

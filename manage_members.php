@@ -176,7 +176,8 @@ if ($filterAddress && $filterAddress != 'all') {
                     <form method="GET" action="">
                         <div class="col-md-3 mb-3">
                             <select class="form-select" id="address" name="address" onchange="this.form.submit()">
-                                <option disabled <?= !isset($_GET['address']) ? 'selected' : '' ?>>Select Purok</option>
+                                <option disabled <?= !isset($_GET['address']) ? 'selected' : '' ?>>Select Address
+                                </option>
                                 <option value="all" <?= ($_GET['address'] ?? '') == 'all' ? 'selected' : '' ?>>Show All
                                 </option>
                                 <option value="Mainuswagon" <?= ($_GET['address'] ?? '') == 'Mainuswagon' ? 'selected' : '' ?>>Mainuswagon</option>

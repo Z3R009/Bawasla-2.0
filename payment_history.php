@@ -53,11 +53,6 @@ if (!$select) {
         th:nth-child(2) {
             display: none;
         }
-
-        td:nth-child(9),
-        th:nth-child(9) {
-            display: none;
-        }
     </style>
 </head>
 

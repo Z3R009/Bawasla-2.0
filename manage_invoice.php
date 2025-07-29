@@ -1,8 +1,26 @@
 <?php
 include 'DBConnection.php';
 
-// Retrieve users
-$select = mysqli_query($connection, "SELECT member_id, CONCAT(last_name, ', ', first_name, ' ', middle_name) AS fullname , tank_no, meter_no, address, mobile_number FROM members");
+if (isset($_SESSION['user_id'])) {
+    $user_id = $_SESSION['user_id'];
+} else {
+    // Handle the case when the user_id is not set, e.g., redirect to login
+    header('Location: index.php');
+    exit();
+}
+
+// Retrieve users ordered alphabetically by fullname
+$select = mysqli_query($connection, "
+    SELECT 
+        member_id, 
+        CONCAT(last_name, ', ', first_name, ' ', middle_name) AS fullname, 
+        tank_no, 
+        meter_no, 
+        address, 
+        mobile_number 
+    FROM members 
+    ORDER BY fullname ASC
+");
 
 
 ?>
@@ -13,7 +31,7 @@ $select = mysqli_query($connection, "SELECT member_id, CONCAT(last_name, ', ', f
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bootstrap Offline Example</title>
+    <title>Manage Invoice</title>
     <!-- Link to your local Bootstrap CSS file -->
     <link href="start/css/style.min.css" rel="stylesheet" />
     <link href="start/css/styles.css" rel="stylesheet" />
@@ -83,62 +101,25 @@ $select = mysqli_query($connection, "SELECT member_id, CONCAT(last_name, ', ', f
                 <a class="nav-link dropdown-toggle" id="navbarDropdown" href="#" role="button" data-bs-toggle="dropdown"
                     aria-expanded="false"><i class="fas fa-user fa-fw"></i></a>
                 <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
-                    <li><a class="dropdown-item" href="#!">Settings</a></li>
-                    <li><a class="dropdown-item" href="#!">Activity Log</a></li>
+                    <li><a class="dropdown-item" href="manage_account_treas.php?user_id=<?php echo $user_id; ?>"><i
+                                class="fa-solid fa-gear"></i><span style="margin-left: 20px; font-size: large; ">
+                                Account Settings</span></a></li>
+                    <li><a class="dropdown-item" href="#!"><i class="fa-solid fa-file"></i><span
+                                style="margin-left: 20px; font-size: large; ">
+                                Activity Logs</span></a></li>
                     <li>
                         <hr class="dropdown-divider" />
                     </li>
-                    <li><a class="dropdown-item" href="logout.php">Logout</a></li>
+                    <li><a class="dropdown-item" href="logout.php"><i class="fa-solid fa-right-from-bracket"></i><span
+                                style="margin-left: 20px; font-size: large; ">
+                                Log Out</span></a></li>
                 </ul>
             </li>
         </ul>
     </nav>
     <div id="layoutSidenav">
-        <div id="layoutSidenav_nav">
-            <nav class="sb-sidenav accordion sb-sidenav-dark" id="sidenavAccordion">
-                <div class="sb-sidenav-menu">
-                    <div class="nav">
-                        <div class="sb-sidenav-menu-heading"></div>
-                        <a class="nav-link" href="dashboard_admin.php">
-                            <div class="sb-nav-link-icon"><i class="fas fa-tachometer-alt"></i></div>
-                            Dashboard
-                        </a>
-                        <a class="nav-link" href="manage_users.php">
-                            <div class="sb-nav-link-icon"><i class="fa-solid fa-users"></i></div>
-                            Manage Users
-                        </a>
-                        <a class="nav-link" href="manage_members.php">
-                            <div class="sb-nav-link-icon"><i class="fa-solid fa-users"></i></div>
-                            Manage Members
-                        </a>
-                        <a class="nav-link" href="transaction_admin.php">
-                            <div class="sb-nav-link-icon"><i class="fa-solid fa-money-bill-transfer"></i></div>
-                            Manage Transaction
-                        </a>
-                        <a class="nav-link" href="#">
-                            <div class="sb-nav-link-icon"><i class="fa-regular fa-file"></i></div>
-                            Manage Invoice
-                        </a>
-                        <a class="nav-link" href="pending_admin.php">
-                            <div class="sb-nav-link-icon"><i class="fa-solid fa-clock"></i></div>
-                            Pending Payment
-                        </a>
-                        <a class="nav-link" href="reports_admin.php">
-                            <div class="sb-nav-link-icon"><i class="fa-solid fa-file-lines"></i></div>
-                            Reports
-                        </a>
-                        <!-- <a class="nav-link" href="index.html">
-                                    <div class="sb-nav-link-icon"><i class="fas fa-tachometer-alt"></i></div>
-                                    Activity Logs
-                                </a> -->
-                    </div>
-                </div>
-                <div class="sb-sidenav-footer">
-                    <div class="small">Logged in as:</div>
-                    President
-                </div>
-            </nav>
-        </div>
+        <?php include "Includes/header_admin.php"; ?>
+        <?php include "Includes/sidebar_admin.php"; ?>
         <div id="layoutSidenav_content">
             <main>
                 <div class="container-fluid px-4">
@@ -176,18 +157,7 @@ $select = mysqli_query($connection, "SELECT member_id, CONCAT(last_name, ', ', f
 
                 </div>
             </main>
-            <footer class="py-4 bg-light mt-auto">
-                <div class="container-fluid px-4">
-                    <div class="d-flex align-items-center justify-content-between small">
-                        <div class="text-muted">Copyright &copy; Your Website 2023</div>
-                        <div>
-                            <a href="#">Privacy Policy</a>
-                            &middot;
-                            <a href="#">Terms &amp; Conditions</a>
-                        </div>
-                    </div>
-                </div>
-            </footer>
+            <?php include "Includes/footer.php"; ?>
         </div>
     </div>
     <!-- startbootstrap -->
