@@ -124,7 +124,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
         td:nth-child(4),
         th:nth-child(4) {
-            width: 200px;
+            display: none;
         }
 
         td:nth-child(7),

@@ -25,10 +25,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $user_id = $_POST['user_id'];
     $member_id = $_POST['member_id'];
     $tank_no = $_POST['tank_no'];
-    $meter_no = $_POST['meter_no'];
     $first_name = $_POST['first_name'];
     $middle_name = $_POST['middle_name'];
     $last_name = $_POST['last_name'];
+    $gender = $_POST['gender'];
     $address = $_POST['address'];
     $user_type = $_POST['user_type'];
     $isDone = $_POST['isDone'];
@@ -47,8 +47,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     }
 
     // Insert into 'members' table
-    $sql_member = "INSERT INTO members (user_id, member_id, tank_no, meter_no, first_name, middle_name, last_name, address, user_type, isDone) 
-                   VALUES ('$user_id', '$member_id', '$tank_no', '$meter_no', '$first_name', '$middle_name', '$last_name', '$address', '$user_type', '$isDone')";
+    $sql_member = "INSERT INTO members (user_id, member_id, tank_no, first_name, middle_name, last_name, gender, address, user_type, isDone) 
+                   VALUES ('$user_id', '$member_id', '$tank_no', '$first_name', '$middle_name', '$last_name', '$gender', '$address', '$user_type', '$isDone')";
 
     // Insert into 'users' table
     $sql_user = "INSERT INTO users (user_id, member_id, user_type) 
@@ -235,6 +235,15 @@ if ($filterAddress && $filterAddress != 'all') {
                                         <!-- Tank Number and Meter Number in a single row with reduced width -->
                                         <div class="row">
                                             <div class="col-md-3 mb-3">
+                                                <label for="address" class="form-label">Gender</label>
+                                                <select class="form-select" id="gender" name="gender">
+                                                    <option selected disabled>Select Gender</option>
+                                                    <option value="Male">Male</option>
+                                                    <option value="Female">Female</option>
+                                                </select>
+                                            </div>
+
+                                            <div class="col-md-3 mb-3">
                                                 <label for="address" class="form-label">Address</label>
                                                 <select class="form-select" id="address" name="address"
                                                     onchange="updateTankNumber(this)">
@@ -249,11 +258,11 @@ if ($filterAddress && $filterAddress != 'all') {
                                                     <option value="Bibiana">Bibiana</option>
                                                 </select>
                                             </div>
-                                            <div class="col-md-3 mb-3">
+                                            <!-- <div class="col-md-3 mb-3">
                                                 <label for="meter_no" class="form-label">Meter Number</label>
                                                 <input type="number" class="form-control" id="meter_no" name="meter_no"
                                                     placeholder="Meter No." required autocomplete="off">
-                                            </div>
+                                            </div> -->
                                             <div class="col-md-3 mb-3">
                                                 <label for="tank_no" class="form-label">Tank Number</label>
                                                 <input type="number" class="form-control" id="tank_no" name="tank_no"
@@ -292,9 +301,9 @@ if ($filterAddress && $filterAddress != 'all') {
                                         <th>Last Name</th>
                                         <th>First Name</th>
                                         <th>Middle Name</th>
-                                        <th>Tank Number</th>
-                                        <th>Meter Number</th>
+                                        <th>Gender</th>
                                         <th>Address</th>
+                                        <th>Tank Number</th>
                                         <th>Actions</th>
                                     </tr>
                                 </thead>
@@ -305,9 +314,9 @@ if ($filterAddress && $filterAddress != 'all') {
                                             <td><?php echo htmlspecialchars($row['last_name']); ?></td>
                                             <td><?php echo htmlspecialchars($row['first_name']); ?></td>
                                             <td><?php echo htmlspecialchars($row['middle_name']); ?></td>
-                                            <td><?php echo htmlspecialchars($row['tank_no']); ?></td>
-                                            <td><?php echo htmlspecialchars($row['meter_no']); ?></td>
+                                            <td><?php echo htmlspecialchars($row['gender']); ?></td>
                                             <td><?php echo htmlspecialchars($row['address']); ?></td>
+                                            <td><?php echo htmlspecialchars($row['tank_no']); ?></td>
                                             <td>
                                                 <div class="dropdown">
                                                     <button class="btn btn-primary dropdown-toggle" type="button"
@@ -317,7 +326,7 @@ if ($filterAddress && $filterAddress != 'all') {
                                                     <ul class="dropdown-menu dropdown-menu-end" style="z-index: 1050;"
                                                         aria-labelledby="actionDropdown">
                                                         <li><a class="dropdown-item" href="javascript:void(0)"
-                                                                onclick="editUser('<?php echo $row['member_id']; ?>', '<?php echo $row['last_name']; ?>', '<?php echo $row['first_name']; ?>', '<?php echo $row['middle_name']; ?>', '<?php echo $row['tank_no']; ?>', '<?php echo $row['meter_no']; ?>', '<?php echo $row['address']; ?>', '<?php echo $row['mobile_number']; ?>' )">Edit</a>
+                                                                onclick="editUser('<?php echo $row['member_id']; ?>', '<?php echo $row['last_name']; ?>', '<?php echo $row['first_name']; ?>', '<?php echo $row['middle_name']; ?>', '<?php echo $row['gender']; ?>', '<?php echo $row['address']; ?>', '<?php echo $row['tank_no']; ?>' )">Edit</a>
                                                         </li>
                                                         <li><a class="dropdown-item" href="javascript:void(0)"
                                                                 onclick="deleteUser(<?php echo $row['member_id']; ?>)">Delete</a>
@@ -372,38 +381,45 @@ if ($filterAddress && $filterAddress != 'all') {
 
                                         <div class="row">
                                             <div class="col-md-3 mb-3">
-                                                <label for="edit_tank_no" class="form-label">Tank Number</label>
-                                                <input type="number" class="form-control" name="tank_no"
-                                                    id="edit_tank_no" placeholder="Enter Tank Number" autocomplete="off"
-                                                    required>
+                                                <label for="address" class="form-label">Gender</label>
+                                                <select class="form-select" id="edit_gender" name="gender">
+                                                    <option selected disabled>Select Gender</option>
+                                                    <option value="Male">Male</option>
+                                                    <option value="Female">Female</option>
+                                                </select>
                                             </div>
-                                            <div class=" col-md-3 mb-3">
-                                                <label for="edit_meter_no" class="form-label">Meter Number</label>
-                                                <input type="number" class="form-control" name="meter_no"
-                                                    id="edit_meter_no" placeholder="Enter Meter Number"
-                                                    autocomplete="off" autocomplete="off" required>
-                                            </div>
+
                                             <div class="col-md-3 mb-3">
-                                                <label for="edit_address" class="form-label">Address</label>
-                                                <select class="form-select" id="edit_address" name="address">
+                                                <label for="address" class="form-label">Address</label>
+                                                <select class="form-select" id="edit_address" name="address"
+                                                    onchange="updateTankNumber(this)">
+
                                                     <option selected disabled>Select Address</option>
                                                     <option value="Mainuswagon">Mainuswagon</option>
-                                                    <option value="Riverside">Riverside</option>
+                                                    <option value="Mabuhay">Mabuhay</option>
                                                     <option value="Malipayon">Malipayon</option>
                                                     <option value="Malipayon Extension">Malipayon Extension</option>
+                                                    <option value="Riverside">Riverside</option>
                                                     <option value="Riverside Extension">Riverside Extension</option>
-                                                    <option value="Mabuhay">Mabuhay</option>
                                                     <option value="Bibiana">Bibiana</option>
                                                 </select>
                                             </div>
                                             <!-- <div class="col-md-3 mb-3">
-                                                <label for="edit_mobile_number" class="form-label">Mobile Number</label>
-                                                <input type="text" class="form-control" id="edit_mobile_number"
+                                                <label for="meter_no" class="form-label">Meter Number</label>
+                                                <input type="number" class="form-control" id="meter_no" name="meter_no"
+                                                    placeholder="Meter No." required autocomplete="off">
+                                            </div> -->
+                                            <div class="col-md-3 mb-3">
+                                                <label for="tank_no" class="form-label">Tank Number</label>
+                                                <input type="number" class="form-control" id="edit_tank_no"
+                                                    name="tank_no" placeholder="Tank No." required autocomplete="off"
+                                                    readonly>
+                                            </div>
+                                            <!-- <div class="col-md-3 mb-3">
+                                                <label for="mobile_number" class="form-label">Mobile Number</label>
+                                                <input type="text" class="form-control" id="mobile_number"
                                                     name="mobile_number" required maxlength="13" autocomplete="off"
                                                     placeholder="Enter Mobile Number">
-                                                <span id="errorMsg" style="color: red; display: none;">Please enter
-                                                    numbers
-                                                    only</span>
                                             </div> -->
                                         </div>
 
@@ -454,14 +470,14 @@ if ($filterAddress && $filterAddress != 'all') {
 
     <script>
         // Function to handle the Edit button click and populate the modal with user data
-        function editUser(user_id, last_name, first_name, middle_name, tank_no, meter_no, address) {
+        function editUser(user_id, last_name, first_name, middle_name, gender, address, tank_no) {
             document.getElementById('edit_user_id').value = user_id;
             document.getElementById('edit_last_name').value = last_name;
             document.getElementById('edit_first_name').value = first_name;
             document.getElementById('edit_middle_name').value = middle_name;
-            document.getElementById('edit_tank_no').value = tank_no;
-            document.getElementById('edit_meter_no').value = meter_no;
+            document.getElementById('edit_gender').value = gender;
             document.getElementById('edit_address').value = address;
+            document.getElementById('edit_tank_no').value = tank_no;
 
             // Show the modal
             var editUserModal = new bootstrap.Modal(document.getElementById('editUserModal'));
@@ -474,9 +490,9 @@ if ($filterAddress && $filterAddress != 'all') {
             var last_name = document.getElementById('edit_last_name').value;
             var first_name = document.getElementById('edit_first_name').value;
             var middle_name = document.getElementById('edit_middle_name').value;
-            var tank_no = document.getElementById('edit_tank_no').value;
-            var meter_no = document.getElementById('edit_meter_no').value;
+            var gender = document.getElementById('edit_gender').value;
             var address = document.getElementById('edit_address').value;
+            var tank_no = document.getElementById('edit_tank_no').value;
 
             // Example code for sending data to the server
             // You should implement the actual save functionality, e.g., using AJAX
@@ -484,9 +500,9 @@ if ($filterAddress && $filterAddress != 'all') {
             console.log('last_name:', last_name);
             console.log('first_name:', first_name);
             console.log('middle_name:', middle_name);
-            console.log('tank_no:', tank_no);
-            console.log('meter_no:', meter_no);
+            console.log('gender:', gender);
             console.log('address:', address);
+            console.log('tank_no:', tank_no);
             // Close the modal
             var editUserModal = bootstrap.Modal.getInstance(document.getElementById('editUserModal'));
             editUserModal.hide();
@@ -544,9 +560,8 @@ if ($filterAddress && $filterAddress != 'all') {
     <script>
         function updateTankNumber(selectElement) {
             const selectedAddress = selectElement.value;
-            const tankInput = document.getElementById('tank_no');
-
-            console.log("Selected address:", selectedAddress);
+            const formGroup = selectElement.closest('.row'); // get parent row
+            const tankInput = formGroup.querySelector('input[name="tank_no"]'); // finds tank_no in the same section
 
             const tankMapping = {
                 'Mainuswagon': 1,
@@ -561,6 +576,7 @@ if ($filterAddress && $filterAddress != 'all') {
             tankInput.value = tankMapping[selectedAddress] ?? '';
         }
     </script>
+
 
 
 
