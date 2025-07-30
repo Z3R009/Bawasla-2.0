@@ -15,9 +15,7 @@ $select = mysqli_query($connection, "
         members.member_id, 
         CONCAT(members.last_name, ', ', members.first_name, ' ', members.middle_name) AS fullname, 
         members.tank_no, 
-        members.meter_no, 
         members.address, 
-        members.mobile_number, 
         arrears.arrears_amount
     FROM 
         members
@@ -129,10 +127,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                                 <thead class="table-dark">
                                     <tr>
                                         <th>Fullname</th>
-                                        <th>Tank Number</th>
-                                        <th>Meter Number</th>
                                         <th>Address</th>
-                                        <th>Mobile Number</th>
+                                        <th>Tank Number</th>
                                         <th>Arrears</th>
                                         <th>Actions</th>
                                     </tr>
@@ -153,15 +149,13 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                                         ?>
                                         <tr>
                                             <td><?php echo htmlspecialchars($row['fullname']); ?></td>
-                                            <td><?php echo htmlspecialchars($row['tank_no']); ?></td>
-                                            <td><?php echo htmlspecialchars($row['meter_no']); ?></td>
                                             <td><?php echo htmlspecialchars($row['address']); ?></td>
-                                            <td><?php echo htmlspecialchars($row['mobile_number']); ?></td>
+                                            <td><?php echo htmlspecialchars($row['tank_no']); ?></td>
                                             <td><?php echo htmlspecialchars($row['arrears_amount']); ?></td>
                                             <td>
                                                 <button class="btn btn-primary" data-bs-toggle="modal"
                                                     data-bs-target="#calculateBillModal"
-                                                    onclick="openModal(<?php echo $row['member_id']; ?>, '<?php echo htmlspecialchars($row['fullname']); ?>',  '<?php echo htmlspecialchars($row['tank_no']); ?>' , '<?php echo htmlspecialchars($row['meter_no']); ?>' , '<?php echo htmlspecialchars($row['address']); ?>' , '<?php echo htmlspecialchars($row['mobile_number']); ?>' , '<?php echo $user_id; ?>', '<?php echo htmlspecialchars($row['arrears_amount']); ?>' , '<?php echo $user_id; ?>', '<?php echo $previous_reading; ?>')">
+                                                    onclick="openModal(<?php echo $row['member_id']; ?>, '<?php echo htmlspecialchars($row['fullname']); ?>', '<?php echo htmlspecialchars($row['address']); ?>' , '<?php echo htmlspecialchars($row['tank_no']); ?>' , '<?php echo $user_id; ?>', '<?php echo htmlspecialchars($row['arrears_amount']); ?>' , '<?php echo $user_id; ?>', '<?php echo $previous_reading; ?>')">
 
                                                     Read Meter
                                                 </button>
