@@ -16,7 +16,7 @@ $currentPage = basename($_SERVER['PHP_SELF']);
 ?>
 <aside>
     <div id="layoutSidenav_nav">
-        <nav class="sb-sidenav accordion sb-sidenav-dark" id="sidenavAccordion">
+        <nav class="sb-sidenav accordion sb-sidenav-dark no-print" id="sidenavAccordion">
             <div class="sb-sidenav-menu">
                 <div class="nav">
                     <!-- Navbar Brand with logo-->
@@ -59,17 +59,17 @@ $currentPage = basename($_SERVER['PHP_SELF']);
                     <?php
                     $currentPage = basename($_SERVER['PHP_SELF']);
                     ?>
-                    <a class="nav-link <?php echo in_array($currentPage, ['manage_invoice.php', 'all_invoice.php']) ? 'active' : ''; ?>"
+                    <a class="nav-link <?php echo in_array($currentPage, ['manage_invoice.php', 'all_invoice.php', 'monthly_invoice.php']) ? 'active' : ''; ?>"
                         href="manage_invoice.php?user_id=<?php echo $user_id; ?>">
                         <div class="sb-nav-link-icon"><i class="fa-solid fa-file-lines"></i></div>
-                        Manage Invoice
+                        Billing Statement
                     </a>
 
 
-                    <a class="nav-link <?php echo $currentPage == 'reports_admin.php' ? 'active' : ''; ?>"
-                        href="reports_admin.php?user_id=<?php echo $user_id; ?>">
+                    <a class="nav-link <?php echo $currentPage == 'daily_payment_reports.php' ? 'active' : ''; ?>"
+                        href="daily_payment_reports.php?user_id=<?php echo $user_id; ?>">
                         <div class="sb-nav-link-icon"><i class="fa-solid fa-file-lines"></i></div>
-                        Billing Reports
+                        Daily Payment Reports
                     </a>
 
                     <a class="nav-link <?php echo $currentPage == 'payment_history.php' ? 'active' : ''; ?>"

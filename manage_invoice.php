@@ -124,11 +124,16 @@ $select = mysqli_query($connection, "
             <main>
                 <div class="container-fluid px-4">
                     <h1 class="mt-4 d-flex justify-content-between align-items-center">
-                        Manage Invoice
+                        Billing Statement
                     </h1>
 
+                    <br>
+                    <button class="btn btn-primary ms-3" type="button"
+                        onclick="window.location.href='monthly_invoice.php?user_id=<?php echo $user_id; ?>'">
+                        View Monthly Invoice
+                    </button>
 
-                    </ol>
+                    <br>
                     <div class="card mb-4">
                         <div class="card-body">
                             <table id="datatablesSimple">

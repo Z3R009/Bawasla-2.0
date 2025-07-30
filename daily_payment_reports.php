@@ -22,13 +22,13 @@ if (isset($_SESSION['user_id'])) {
 }
 
 // retrieve
-$month_filter = "";
-if (isset($_GET['month']) && $_GET['month'] !== "") {
-    $selected_month = $_GET['month'];
-    $month_filter = "WHERE DATE_FORMAT(payment_date, '%Y-%m') = '$selected_month'";
-}
+$today = date('Y-m-d');
+$day_filter = "WHERE DATE(payment_date) = '$today'";
 
-$select = mysqli_query($connection, "SELECT * FROM history $month_filter ORDER BY payment_date DESC");
+
+$select = mysqli_query($connection, "SELECT * FROM history $day_filter ORDER BY payment_date DESC");
+
+
 
 
 // Check for errors in the SQL query
@@ -36,6 +36,14 @@ if (!$select) {
     echo "Error in query: " . mysqli_error($connection);
     exit();
 }
+?>
+
+<?php
+// Re-run query to calculate total amount paid for the selected month
+
+$total_query = mysqli_query($connection, "SELECT SUM(amount_paid) AS total_paid FROM history $day_filter");
+$total_row = mysqli_fetch_assoc($total_query);
+$total_paid = $total_row['total_paid'] ?? 0;
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -74,6 +82,8 @@ if (!$select) {
                     <h1 class="mt-4 d-flex justify-content-between align-items-center">
                         Payment History
                     </h1>
+                    <h5 class="text-muted mb-3">Showing payments for: <?= date('F d, Y') ?></h5>
+
 
                     <!-- <ul class="nav nav-tabs">
                         <li class="nav-item">
@@ -92,33 +102,13 @@ if (!$select) {
 
                     <br>
 
-                    <?php
-                    // Re-run query to calculate total amount paid for the selected month
-                    $total_query = mysqli_query($connection, "SELECT SUM(amount_paid) AS total_paid FROM history $month_filter");
-                    $total_row = mysqli_fetch_assoc($total_query);
-                    $total_paid = $total_row['total_paid'] ?? 0;
-                    ?>
+
 
                     <!-- Container to hold month select and total amount -->
                     <div class="d-flex justify-content-between align-items-center mb-3"
                         style="gap: 20px; flex-wrap: wrap;">
                         <!-- Month Select Form -->
-                        <form method="GET" id="monthForm" class="d-flex align-items-center">
-                            <select name="month" id="month" class="form-select" style="width: 250px;">
-                                <option value="">-- All Months --</option>
-                                <?php
-                                $month_sql = "SELECT DISTINCT DATE_FORMAT(payment_date, '%Y-%m') AS month FROM history ORDER BY month DESC";
-                                $month_result = mysqli_query($connection, $month_sql);
 
-                                while ($row = mysqli_fetch_assoc($month_result)) {
-                                    $month_value = $row['month'];
-                                    $selected = (isset($_GET['month']) && $_GET['month'] === $month_value) ? 'selected' : '';
-                                    $formatted_month = date('F Y', strtotime($month_value));
-                                    echo "<option value='$month_value' $selected>$formatted_month</option>";
-                                }
-                                ?>
-                            </select>
-                        </form>
 
 
                         <!-- Total Amount Paid Display -->
