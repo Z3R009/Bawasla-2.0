@@ -124,7 +124,7 @@ if (!empty($errors)): ?>
 <body class="sb-nav-fixed">
     <nav class="sb-topnav navbar navbar-expand navbar-dark bg-dark">
         <!-- Navbar Brand-->
-        <a class="navbar-brand ps-3" href="dashboard_admin.php?user_id=<?php echo $user_id; ?>">
+        <a class="navbar-brand ps-3" href="dashboard_secretary.php?user_id=<?php echo $user_id; ?>">
             <img src="img/lg2.png" alt="Logo" style="height: 40px; width: auto;">
         </a>
         <!-- Sidebar Toggle-->

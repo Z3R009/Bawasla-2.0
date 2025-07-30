@@ -30,9 +30,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $middle_name = $_POST['middle_name'];
     $last_name = $_POST['last_name'];
     $address = $_POST['address'];
-    $mobile_number = $_POST['mobile_number'];
-    $username = $_POST['username'];
-    $password = password_hash($_POST['password'], PASSWORD_BCRYPT); // Securely hash the password
     $user_type = $_POST['user_type'];
     $isDone = $_POST['isDone'];
 
@@ -50,12 +47,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     }
 
     // Insert into 'members' table
-    $sql_member = "INSERT INTO members (user_id, member_id, tank_no, meter_no, first_name, middle_name, last_name, address, mobile_number, username, password, user_type, isDone) 
-                   VALUES ('$user_id', '$member_id', '$tank_no', '$meter_no', '$first_name', '$middle_name', '$last_name', '$address', '$mobile_number', '$username', '$password', '$user_type', '$isDone')";
+    $sql_member = "INSERT INTO members (user_id, member_id, tank_no, meter_no, first_name, middle_name, last_name, address, user_type, isDone) 
+                   VALUES ('$user_id', '$member_id', '$tank_no', '$meter_no', '$first_name', '$middle_name', '$last_name', '$address', '$user_type', '$isDone')";
 
     // Insert into 'users' table
-    $sql_user = "INSERT INTO users (user_id, member_id, username, password, user_type) 
-                 VALUES ('$user_id', '$member_id', '$username', '$password', '$user_type')";
+    $sql_user = "INSERT INTO users (user_id, member_id, user_type) 
+                 VALUES ('$user_id', '$member_id', '$user_type')";
 
     // Execute both queries
     if ($connection->query($sql_member) && $connection->query($sql_user)) {
@@ -238,9 +235,19 @@ if ($filterAddress && $filterAddress != 'all') {
                                         <!-- Tank Number and Meter Number in a single row with reduced width -->
                                         <div class="row">
                                             <div class="col-md-3 mb-3">
-                                                <label for="tank_no" class="form-label">Tank Number</label>
-                                                <input type="number" class="form-control" id="tank_no" name="tank_no"
-                                                    placeholder="Tank No." required autocomplete="off">
+                                                <label for="address" class="form-label">Address</label>
+                                                <select class="form-select" id="address" name="address"
+                                                    onchange="updateTankNumber(this)">
+
+                                                    <option selected disabled>Select Address</option>
+                                                    <option value="Mainuswagon">Mainuswagon</option>
+                                                    <option value="Mabuhay">Mabuhay</option>
+                                                    <option value="Malipayon">Malipayon</option>
+                                                    <option value="Malipayon Extension">Malipayon Extension</option>
+                                                    <option value="Riverside">Riverside</option>
+                                                    <option value="Riverside Extension">Riverside Extension</option>
+                                                    <option value="Bibiana">Bibiana</option>
+                                                </select>
                                             </div>
                                             <div class="col-md-3 mb-3">
                                                 <label for="meter_no" class="form-label">Meter Number</label>
@@ -248,41 +255,16 @@ if ($filterAddress && $filterAddress != 'all') {
                                                     placeholder="Meter No." required autocomplete="off">
                                             </div>
                                             <div class="col-md-3 mb-3">
-                                                <label for="address" class="form-label">Address</label>
-                                                <select class="form-select" id="address" name="address">
-                                                    <option selected disabled>Select Address</option>
-                                                    <option value="Mainuswagon">Mainuswagon</option>
-                                                    <option value="Riverside">Riverside</option>
-                                                    <option value="Malipayon">Malipayon</option>
-                                                    <option value="Malipayon Extension">Malipayon Extension</option>
-                                                    <option value="Riverside Extension">Riverside Extension</option>
-                                                    <option value="Mabuhay">Mabuhay</option>
-                                                    <option value="Bibiana">Bibiana</option>
-                                                </select>
+                                                <label for="tank_no" class="form-label">Tank Number</label>
+                                                <input type="number" class="form-control" id="tank_no" name="tank_no"
+                                                    placeholder="Tank No." required autocomplete="off" readonly>
                                             </div>
-                                            <div class="col-md-3 mb-3">
+                                            <!-- <div class="col-md-3 mb-3">
                                                 <label for="mobile_number" class="form-label">Mobile Number</label>
                                                 <input type="text" class="form-control" id="mobile_number"
                                                     name="mobile_number" required maxlength="13" autocomplete="off"
                                                     placeholder="Enter Mobile Number">
-
-                                                <!-- <span id="errorMsg" style="color: red; display: none;">Please enter
-                                                    numbers only</span> -->
-                                            </div>
-                                        </div>
-
-
-
-                                        <!-- Username and Password fields in full width -->
-                                        <div class="mb-3">
-                                            <label for="username" class="form-label">Username</label>
-                                            <input type="text" class="form-control" id="username" name="username"
-                                                placeholder="Enter Username" required autocomplete="off">
-                                        </div>
-                                        <div class="mb-3">
-                                            <label for="password" class="form-label">Password</label>
-                                            <input type="password" class="form-control" id="password" name="password"
-                                                placeholder="Enter Password" required autocomplete="off">
+                                            </div> -->
                                         </div>
 
                                         <input type="hidden" id="user_type" name="user_type" value="Member">
@@ -313,8 +295,6 @@ if ($filterAddress && $filterAddress != 'all') {
                                         <th>Tank Number</th>
                                         <th>Meter Number</th>
                                         <th>Address</th>
-                                        <th>Mobile Number</th>
-                                        <th>Username</th>
                                         <th>Actions</th>
                                     </tr>
                                 </thead>
@@ -328,8 +308,6 @@ if ($filterAddress && $filterAddress != 'all') {
                                             <td><?php echo htmlspecialchars($row['tank_no']); ?></td>
                                             <td><?php echo htmlspecialchars($row['meter_no']); ?></td>
                                             <td><?php echo htmlspecialchars($row['address']); ?></td>
-                                            <td><?php echo htmlspecialchars($row['mobile_number']); ?></td>
-                                            <td><?php echo htmlspecialchars($row['username']); ?></td>
                                             <td>
                                                 <div class="dropdown">
                                                     <button class="btn btn-primary dropdown-toggle" type="button"
@@ -418,7 +396,7 @@ if ($filterAddress && $filterAddress != 'all') {
                                                     <option value="Bibiana">Bibiana</option>
                                                 </select>
                                             </div>
-                                            <div class="col-md-3 mb-3">
+                                            <!-- <div class="col-md-3 mb-3">
                                                 <label for="edit_mobile_number" class="form-label">Mobile Number</label>
                                                 <input type="text" class="form-control" id="edit_mobile_number"
                                                     name="mobile_number" required maxlength="13" autocomplete="off"
@@ -426,7 +404,7 @@ if ($filterAddress && $filterAddress != 'all') {
                                                 <span id="errorMsg" style="color: red; display: none;">Please enter
                                                     numbers
                                                     only</span>
-                                            </div>
+                                            </div> -->
                                         </div>
 
 
@@ -476,7 +454,7 @@ if ($filterAddress && $filterAddress != 'all') {
 
     <script>
         // Function to handle the Edit button click and populate the modal with user data
-        function editUser(user_id, last_name, first_name, middle_name, tank_no, meter_no, address, mobile_number) {
+        function editUser(user_id, last_name, first_name, middle_name, tank_no, meter_no, address) {
             document.getElementById('edit_user_id').value = user_id;
             document.getElementById('edit_last_name').value = last_name;
             document.getElementById('edit_first_name').value = first_name;
@@ -484,7 +462,6 @@ if ($filterAddress && $filterAddress != 'all') {
             document.getElementById('edit_tank_no').value = tank_no;
             document.getElementById('edit_meter_no').value = meter_no;
             document.getElementById('edit_address').value = address;
-            document.getElementById('edit_mobile_number').value = mobile_number;
 
             // Show the modal
             var editUserModal = new bootstrap.Modal(document.getElementById('editUserModal'));
@@ -500,7 +477,6 @@ if ($filterAddress && $filterAddress != 'all') {
             var tank_no = document.getElementById('edit_tank_no').value;
             var meter_no = document.getElementById('edit_meter_no').value;
             var address = document.getElementById('edit_address').value;
-            var mobile_number = document.getElementById('edit_mobile_number').value;
 
             // Example code for sending data to the server
             // You should implement the actual save functionality, e.g., using AJAX
@@ -511,14 +487,15 @@ if ($filterAddress && $filterAddress != 'all') {
             console.log('tank_no:', tank_no);
             console.log('meter_no:', meter_no);
             console.log('address:', address);
-            console.log('mobile_number:', mobile_number);
             // Close the modal
             var editUserModal = bootstrap.Modal.getInstance(document.getElementById('editUserModal'));
             editUserModal.hide();
         }
     </script>
 
-    <script>
+
+    <!-- mobile number -->
+    <!-- <script>
         const mobile_numberInput = document.getElementById('mobile_number');
         const errorMessage = document.getElementById('errorMsg');
 
@@ -536,7 +513,7 @@ if ($filterAddress && $filterAddress != 'all') {
                 errorMessage.style.display = 'none';
             }
         });
-    </script>
+    </script> -->
 
     <!-- same id on textfield -->
     <script>
@@ -562,6 +539,30 @@ if ($filterAddress && $filterAddress != 'all') {
         }
 
     </script> -->
+
+    <!-- tank address selection -->
+    <script>
+        function updateTankNumber(selectElement) {
+            const selectedAddress = selectElement.value;
+            const tankInput = document.getElementById('tank_no');
+
+            console.log("Selected address:", selectedAddress);
+
+            const tankMapping = {
+                'Mainuswagon': 1,
+                'Mabuhay': 1,
+                'Malipayon': 2,
+                'Malipayon Extension': 2,
+                'Riverside': 3,
+                'Riverside Extension': 3,
+                'Bibiana': 3
+            };
+
+            tankInput.value = tankMapping[selectedAddress] ?? '';
+        }
+    </script>
+
+
 
 </body>
 

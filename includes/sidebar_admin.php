@@ -53,7 +53,7 @@ $currentPage = basename($_SERVER['PHP_SELF']);
                     <a class="nav-link <?php echo $currentPage == 'manage_transaction.php' ? 'active' : ''; ?>"
                         href="manage_transaction.php?user_id=<?php echo $user_id; ?>">
                         <div class="sb-nav-link-icon"><i class="fa-solid fa-money-bill-transfer"></i></div>
-                        Manage Transaction
+                        Record Payment
                     </a>
 
                     <?php
