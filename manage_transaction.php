@@ -14,8 +14,7 @@ $select = mysqli_query($connection, "
     SELECT 
         meter_reading.reading_date, 
         CONCAT(members.last_name, ', ', members.first_name, ' ', members.middle_name) AS fullname,
-        members.tank_no, 
-        members.meter_no,    
+        members.tank_no,   
         members.address, 
         meter_reading.current_charges,
         meter_reading.reading_id,
@@ -215,7 +214,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                                                     data-readingdate="<?php echo htmlspecialchars($row['reading_date']); ?>"
                                                     data-fullname="<?php echo htmlspecialchars($row['fullname']); ?>"
                                                     data-tankno="<?php echo htmlspecialchars($row['tank_no']); ?>"
-                                                    data-meterno="<?php echo htmlspecialchars($row['meter_no']); ?>"
                                                     data-duedate="<?php echo htmlspecialchars($row['due_date']); ?>"
                                                     data-disconnectiondate="<?php echo htmlspecialchars($row['disconnection_date']); ?>"
                                                     data-address="<?php echo htmlspecialchars($row['address']); ?>"
@@ -261,21 +259,19 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                                                     name="fullname" readonly>
                                             </div>
 
-                                            <div class="row">
-                                                <div class="col-md-6 mb-3">
-                                                    <div class="form-check">
-                                                        <input class="form-check-input" type="checkbox"
-                                                            id="senior_discount" name="senior_discount" value="1"
-                                                            onchange="toggleDiscountText()">
-                                                        <label class="form-check-label" for="senior_discount">
-                                                            Apply Senior Citizen Discount
-                                                        </label>
-                                                    </div>
+                                            <div class="mb-3">
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="checkbox" id="senior_discount"
+                                                        name="senior_discount" value="1"
+                                                        onchange="toggleDiscountText()">
+                                                    <label class="form-check-label" for="senior_discount">
+                                                        Apply Senior Citizen Discount
+                                                    </label>
                                                 </div>
                                             </div>
 
 
-                                            <input type="text" id="discount_text" class="form-control" name="discount"
+                                            <input type="hidden" id="discount_text" class="form-control" name="discount"
                                                 readonly value="None">
 
                                             <div class="mb-3">
@@ -445,6 +441,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             document.getElementById('amount_paid').value = ''; // Clear payment input
             document.getElementById('change').value = '0.00'; // Reset change field to 0.00
             document.getElementById('arrears_amount').value = '0.00'; // Reset arrears field to 0.00
+            document.getElementById('or_number').value = '';
         });
     </script>
 
