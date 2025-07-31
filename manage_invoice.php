@@ -15,9 +15,7 @@ $select = mysqli_query($connection, "
         member_id, 
         CONCAT(last_name, ', ', first_name, ' ', middle_name) AS fullname, 
         tank_no, 
-        meter_no, 
-        address, 
-        mobile_number 
+        address
     FROM members 
     ORDER BY fullname ASC
 ");
