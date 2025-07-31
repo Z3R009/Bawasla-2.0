@@ -43,7 +43,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if ($_SESSION['user_type'] == 'Secretary') {
                 header('Location: dashboard_secretary.php?user_id=' . $_SESSION['user_id']);
             } elseif ($_SESSION['user_type'] == 'Admin') {
-                header('Location: manage_users.php?user_id=' . $_SESSION['user_id']);
+                header('Location: admin.php?user_id=' . $_SESSION['user_id']);
             } else {
                 echo "<script>alert('Invalid user type value');</script>";
             }
