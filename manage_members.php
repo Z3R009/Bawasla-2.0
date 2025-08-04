@@ -46,6 +46,21 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         // $connection->query($insert_address_sql);
     }
 
+    // Check for duplicate name entry
+    $check_name_sql = "SELECT COUNT(*) as count FROM members 
+WHERE first_name = ? AND middle_name = ? AND last_name = ?";
+    $stmt = $connection->prepare($check_name_sql);
+    $stmt->bind_param("sss", $first_name, $middle_name, $last_name);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $row = $result->fetch_assoc();
+
+    if ($row['count'] > 0) {
+        echo "<script>alert('A member with the same name already exists.'); window.history.back();</script>";
+        exit();
+    }
+
+
     // Insert into 'members' table
     $sql_member = "INSERT INTO members (user_id, member_id, tank_no, first_name, middle_name, last_name, gender, address, user_type, isDone) 
                    VALUES ('$user_id', '$member_id', '$tank_no', '$first_name', '$middle_name', '$last_name', '$gender', '$address', '$user_type', '$isDone')";

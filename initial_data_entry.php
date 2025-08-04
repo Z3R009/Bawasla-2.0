@@ -1,9 +1,6 @@
 <?php
 // Database configuration - UPDATE THESE WITH YOUR DATABASE DETAILS
-$host = 'localhost';
-$dbname = 'bawasla 2.0';
-$username = 'root';
-$password = '';
+include 'DBConnection.php';
 
 try {
     $pdo = new PDO("mysql:host=$host;dbname=$dbname", $username, $password);
