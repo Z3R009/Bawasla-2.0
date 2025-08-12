@@ -69,7 +69,13 @@ function updateOverdueToArrears($connection)
 updateOverdueToArrears($connection);
 
 // Retrieve members with arrears and their current status
-$select = mysqli_query($connection, "
+$address_filter = '';
+if (isset($_GET['address']) && $_GET['address'] !== 'all') {
+    $address = mysqli_real_escape_string($connection, $_GET['address']);
+    $address_filter = "WHERE members.address = '$address'";
+}
+
+$select_query = "
     SELECT 
         members.member_id, 
         CONCAT(members.last_name, ', ', members.first_name, ' ', members.middle_name) AS fullname, 
@@ -81,8 +87,12 @@ $select = mysqli_query($connection, "
     LEFT JOIN 
         arrears 
         ON members.member_id = arrears.member_id
+    $address_filter
     ORDER BY members.last_name, members.first_name
-");
+";
+
+$select = mysqli_query($connection, $select_query);
+
 
 // Handle POST requests for meter reading
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
@@ -138,7 +148,17 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         }
     }
 }
+
 ?>
+
+<?php
+if (isset($_GET['address']) && $_GET['address'] !== 'all') {
+    // echo "<h5>Showing results for: <strong>" . htmlspecialchars($_GET['address']) . "</strong></h5>";
+} else {
+    // echo "<h5>Showing results for: <strong>All Addresses</strong></h5>";
+}
+?>
+
 
 <!DOCTYPE html>
 <html lang="en">
@@ -180,6 +200,29 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             <main>
                 <div class="container-fluid px-4">
                     <h1 class="mt-4">Manage Meter</h1>
+
+                    <br>
+                    <form method="GET" action="">
+                        <div class="col-md-3 mb-3">
+                            <select class="form-select" id="address" name="address" onchange="this.form.submit()">
+                                <option disabled <?= !isset($_GET['address']) ? 'selected' : '' ?>>Select Address
+                                </option>
+                                <option value="all" <?= ($_GET['address'] ?? '') == 'all' ? 'selected' : '' ?>>Show All
+                                </option>
+                                <option value="Mainuswagon" <?= ($_GET['address'] ?? '') == 'Mainuswagon' ? 'selected' : '' ?>>Mainuswagon</option>
+                                <option value="Riverside" <?= ($_GET['address'] ?? '') == 'Riverside' ? 'selected' : '' ?>>
+                                    Riverside</option>
+                                <option value="Malipayon" <?= ($_GET['address'] ?? '') == 'Malipayon' ? 'selected' : '' ?>>
+                                    Malipayon</option>
+                                <option value="Malipayon Extension" <?= ($_GET['address'] ?? '') == 'Malipayon Extension' ? 'selected' : '' ?>>Malipayon Extension</option>
+                                <option value="Riverside Extension" <?= ($_GET['address'] ?? '') == 'Riverside Extension' ? 'selected' : '' ?>>Riverside Extension</option>
+                                <option value="Mabuhay" <?= ($_GET['address'] ?? '') == 'Mabuhay' ? 'selected' : '' ?>>
+                                    Mabuhay</option>
+                                <option value="Bibiana" <?= ($_GET['address'] ?? '') == 'Bibiana' ? 'selected' : '' ?>>
+                                    Bibiana</option>
+                            </select>
+                        </div>
+                    </form>
                     <div class="card mb-4">
                         <div class="card-body">
                             <!-- Legend -->

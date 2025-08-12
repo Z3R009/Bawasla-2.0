@@ -1,6 +1,9 @@
 <?php
 // Database configuration - UPDATE THESE WITH YOUR DATABASE DETAILS
-include 'DBConnection.php';
+$host = 'localhost';
+$dbname = 'bawasla 2.0';
+$username = 'root';
+$password = '';
 
 try {
     $pdo = new PDO("mysql:host=$host;dbname=$dbname", $username, $password);
@@ -156,6 +159,17 @@ try {
             opacity: 0.6;
             pointer-events: none;
         }
+
+        .edit-mode {
+            background-color: #fff3cd !important;
+            border-left: 4px solid #ffc107 !important;
+        }
+
+        .cancel-edit-btn {
+            background: linear-gradient(135deg, #6c757d 0%, #495057 100%);
+            border: none;
+            color: white;
+        }
     </style>
 </head>
 
@@ -174,14 +188,17 @@ try {
                         <div id="alertContainer"></div>
 
                         <!-- Member Entry Form -->
-                        <div class="card mb-4">
-                            <div class="card-header bg-primary text-white">
+                        <div class="card mb-4" id="memberCard">
+                            <div class="card-header bg-primary text-white" id="cardHeader">
                                 <h4 class="mb-0"><i class="fas fa-user-plus me-2"></i>Add Member with Current Data</h4>
                             </div>
                             <div class="card-body">
                                 <form id="memberForm">
                                     <div class="row">
                                         <!-- Member Information -->
+                                        <input type="hidden" id="memberId" name="memberId" value="">
+                                        <input type="hidden" id="formAction" name="action" value="add">
+
                                         <div class="col-md-6">
                                             <h5 class="text-primary mb-3">Member Information</h5>
                                             <div class="mb-3">
@@ -274,6 +291,10 @@ try {
                                             onclick="clearForm()">
                                             <i class="fas fa-undo me-2"></i>Clear Form
                                         </button>
+                                        <button type="button" class="btn cancel-edit-btn btn-lg ms-2" id="cancelEditBtn"
+                                            onclick="cancelEdit()" style="display: none;">
+                                            <i class="fas fa-times me-2"></i>Cancel Edit
+                                        </button>
                                     </div>
                                 </form>
                             </div>
@@ -306,10 +327,11 @@ try {
                             <thead>
                                 <tr>
                                     <th>Name</th>
-                                    <th>Tank #</th>
                                     <th>Address</th>
+                                    <th>Tank #</th>
                                     <th>Current Reading</th>
                                     <th>Arrears</th>
+                                    <th>Last Billing</th>
                                     <th>Actions</th>
                                 </tr>
                             </thead>
@@ -326,10 +348,15 @@ try {
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
     <script>
         let memberCount = 0;
+        let isEditMode = false;
 
         document.getElementById('memberForm').addEventListener('submit', function (e) {
             e.preventDefault();
-            addMember();
+            if (isEditMode) {
+                updateMember();
+            } else {
+                addMember();
+            }
         });
 
         function addMember() {
@@ -350,7 +377,7 @@ try {
                     if (data.success) {
                         showAlert(data.message, 'success');
                         clearForm();
-                        loadMembers(); // Refresh the table
+                        loadMembers();
                         updateMemberCount();
                     } else {
                         showAlert(data.message, 'danger');
@@ -361,10 +388,101 @@ try {
                     showAlert('An error occurred while saving the member.', 'danger');
                 })
                 .finally(() => {
-                    // Reset button state
                     submitBtn.innerHTML = '<i class="fas fa-save me-2"></i>Add Member Data';
                     submitBtn.disabled = false;
                 });
+        }
+
+        function updateMember() {
+            const form = document.getElementById('memberForm');
+            const formData = new FormData(form);
+            const submitBtn = document.getElementById('submitBtn');
+
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Updating...';
+            submitBtn.disabled = true;
+
+            fetch('save_member.php', {
+                method: 'POST',
+                body: formData
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        showAlert(data.message, 'success');
+                        cancelEdit();
+                        loadMembers();
+                    } else {
+                        showAlert(data.message, 'danger');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    showAlert('An error occurred while updating the member.', 'danger');
+                })
+                .finally(() => {
+                    submitBtn.innerHTML = '<i class="fas fa-save me-2"></i>Update Member Data';
+                    submitBtn.disabled = false;
+                });
+        }
+
+        function editMember(memberId) {
+            fetch(`save_member.php?action=getMember&memberId=${memberId}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success && data.member) {
+                        const member = data.member;
+
+                        // Populate form fields
+                        document.getElementById('memberId').value = member.member_id;
+                        document.getElementById('lastName').value = member.last_name;
+                        document.getElementById('firstName').value = member.first_name;
+                        document.getElementById('middleName').value = member.middle_name || '';
+                        document.getElementById('address').value = member.address;
+                        document.getElementById('tankNo').value = member.tank_no;
+                        document.getElementById('currentArrears').value = member.arrears_amount || '0.00';
+                        document.getElementById('currentReading').value = member.current_reading || '0';
+                        document.getElementById('lastBillingMonth').value = member.last_billing_month || '';
+                        document.getElementById('formAction').value = 'update';
+
+                        // Switch to edit mode
+                        isEditMode = true;
+                        const memberCard = document.getElementById('memberCard');
+                        const cardHeader = document.getElementById('cardHeader');
+                        const submitBtn = document.getElementById('submitBtn');
+                        const cancelBtn = document.getElementById('cancelEditBtn');
+
+                        memberCard.classList.add('edit-mode');
+                        cardHeader.innerHTML = '<h4 class="mb-0"><i class="fas fa-edit me-2"></i>Edit Member Data</h4>';
+                        submitBtn.innerHTML = '<i class="fas fa-save me-2"></i>Update Member Data';
+                        cancelBtn.style.display = 'inline-block';
+
+                        // Scroll to form
+                        memberCard.scrollIntoView({ behavior: 'smooth' });
+
+                        showAlert('Member data loaded for editing. Make your changes and click Update.', 'info');
+                    } else {
+                        showAlert('Error loading member data for editing.', 'danger');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    showAlert('An error occurred while loading member data.', 'danger');
+                });
+        }
+
+        function cancelEdit() {
+            isEditMode = false;
+            const memberCard = document.getElementById('memberCard');
+            const cardHeader = document.getElementById('cardHeader');
+            const submitBtn = document.getElementById('submitBtn');
+            const cancelBtn = document.getElementById('cancelEditBtn');
+
+            memberCard.classList.remove('edit-mode');
+            cardHeader.innerHTML = '<h4 class="mb-0"><i class="fas fa-user-plus me-2"></i>Add Member with Current Data</h4>';
+            submitBtn.innerHTML = '<i class="fas fa-save me-2"></i>Add Member Data';
+            cancelBtn.style.display = 'none';
+            document.getElementById('formAction').value = 'add';
+            clearForm();
         }
 
         function loadMembers() {
@@ -381,12 +499,16 @@ try {
 
                             row.innerHTML = `
                             <td>${fullName}</td>
-                            <td>${member.tank_no}</td>
                             <td>${member.address}</td>
+                            <td>${member.tank_no}</td>
                             <td>${member.current_reading || 0}</td>
                             <td>₱${parseFloat(member.arrears_amount || 0).toFixed(2)}</td>
+                            <td>${member.last_billing_month || 'N/A'}</td>
                             <td>
-                                <button class="btn btn-sm btn-danger" onclick="deleteMember(${member.member_id})">
+                                <button class="btn btn-sm btn-warning me-1" onclick="editMember(${member.member_id})" title="Edit Member">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="btn btn-sm btn-danger" onclick="deleteMember(${member.member_id})" title="Delete Member">
                                     <i class="fas fa-trash"></i>
                                 </button>
                             </td>
@@ -405,7 +527,7 @@ try {
         }
 
         function deleteMember(memberId) {
-            if (confirm('Are you sure you want to delete this member?')) {
+            if (confirm('Are you sure you want to delete this member? This action cannot be undone.')) {
                 fetch('save_member.php', {
                     method: 'POST',
                     headers: {
@@ -418,6 +540,7 @@ try {
                         if (data.success) {
                             showAlert(data.message, 'success');
                             loadMembers();
+                            updateMemberCount();
                         } else {
                             showAlert(data.message, 'danger');
                         }
@@ -452,6 +575,8 @@ try {
             document.getElementById('memberForm').reset();
             document.getElementById('currentArrears').value = '0.00';
             document.getElementById('currentReading').value = '0';
+            document.getElementById('memberId').value = '';
+            document.getElementById('formAction').value = 'add';
         }
 
         function showAlert(message, type) {

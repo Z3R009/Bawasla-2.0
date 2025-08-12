@@ -68,6 +68,29 @@ $total_paid = $total_row['total_paid'] ?? 0;
         th:nth-child(2) {
             display: none;
         }
+
+        @media print {
+            body * {
+                visibility: hidden !important;
+            }
+
+            /* Show only the print-section */
+            #print-section,
+            #print-section * {
+                visibility: visible !important;
+            }
+
+            /* Ensure it's displayed and not hidden */
+            #print-section {
+                position: absolute;
+                top: 0;
+                left: 0;
+                display: block !important;
+                width: 100%;
+                background: white;
+                padding: 20px;
+            }
+        }
     </style>
 </head>
 
@@ -117,6 +140,12 @@ $total_paid = $total_row['total_paid'] ?? 0;
                         </div>
                     </div>
 
+                    <!-- Print Button -->
+                    <div class="d-flex justify-content-end mb-3">
+                        <button onclick="window.print()" class="btn btn-primary">
+                            <i class="fas fa-print"></i> Print Summary
+                        </button>
+                    </div>
 
 
                     <div class="card mb-4">
@@ -187,8 +216,48 @@ $total_paid = $total_row['total_paid'] ?? 0;
 
                     </div>
 
+                    <!-- Hidden Printable Version -->
+                    <div id="print-section" style="display: none;">
+                        <h2>Payment Summary</h2>
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Fullname</th>
+                                    <th>OR Number</th>
+                                    <th>Payment Date</th>
+                                    <th>Current Charges</th>
+                                    <th>Discount</th>
+                                    <th>Total Amount Due</th>
+                                    <th>Amount Paid</th>
+                                    <th>Billing Month</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php
+                                // Re-run the query to fetch data again
+                                $print_query = mysqli_query($connection, "SELECT * FROM history $day_filter ORDER BY payment_date DESC");
+                                while ($row = mysqli_fetch_assoc($print_query)) {
+                                    echo "<tr>";
+                                    echo "<td>" . htmlspecialchars($row['fullname']) . "</td>";
+                                    echo "<td>" . htmlspecialchars($row['or_number']) . "</td>";
+                                    echo "<td>" . date('F d, Y', strtotime($row['payment_date'])) . "</td>";
+                                    echo "<td>" . htmlspecialchars($row['current_charges']) . "</td>";
+                                    echo "<td>" . htmlspecialchars($row['discount']) . "</td>";
+                                    echo "<td>" . htmlspecialchars($row['total_amount_due']) . "</td>";
+                                    echo "<td>" . htmlspecialchars($row['amount_paid']) . "</td>";
+                                    echo "<td>" . htmlspecialchars($row['billing_month']) . "</td>";
+                                    echo "</tr>";
+                                }
+                                ?>
+                            </tbody>
+                        </table>
+                    </div>
+
                 </div>
             </main>
+
+
+
             <?php include "Includes/footer.php"; ?>
         </div>
     </div>

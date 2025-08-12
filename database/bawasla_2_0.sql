@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Aug 04, 2025 at 01:02 PM
+-- Generation Time: Aug 06, 2025 at 03:03 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -474,7 +474,7 @@ INSERT INTO `members` (`id`, `user_id`, `member_id`, `last_name`, `first_name`, 
 (448, 430987818, 430987818, 'Teves ', 'Carol Joy ', '', 'Female', 'Mabuhay', 1, 'Member', 'Not Done'),
 (449, 556211133, 556211133, 'Abenes', 'Erma', '', 'Female', 'Riverside Extension', 3, 'Member', 'Not Done'),
 (450, 523654106, 523654106, 'Abenes', 'Gadeon', '', 'Male', 'Riverside Extension', 3, 'Member', 'Not Done'),
-(451, 817044621, 817044621, 'Alliance Church', 'N/A', '', '', 'Riverside Extension', 3, 'Member', 'Not Done'),
+(451, 817044621, 817044621, 'Alliance Church', '', '', '', 'Riverside Extension', 3, 'Member', 'Not Done'),
 (452, 696151150, 696151150, 'Aroña', 'Louelin', '', 'Female', 'Riverside Extension', 3, 'Member', 'Not Done'),
 (453, 699416392, 699416392, 'Casimero', 'David', '', 'Male', 'Riverside Extension', 3, 'Member', 'Not Done'),
 (454, 561577780, 561577780, 'Cayanong', 'Jusilito', '', 'Male', 'Riverside Extension', 3, 'Member', 'Not Done'),
@@ -608,8 +608,8 @@ INSERT INTO `members` (`id`, `user_id`, `member_id`, `last_name`, `first_name`, 
 (581, 604541488, 604541488, 'Derilon', 'Jaime', '', 'Male', 'Mainuswagon', 1, 'Member', 'Not Done'),
 (582, 482054692, 482054692, 'Sionosa ', 'Blas', '', 'Male', 'Mainuswagon', 1, 'Member', 'Not Done'),
 (583, 363307298, 363307298, 'Derilon', 'Jesus', '', 'Male', 'Mainuswagon', 1, 'Member', 'Not Done'),
-(584, 186997838, 186997838, 'Silway-7 High School', 'N/A', '', '', 'Mainuswagon', 1, 'Member', 'Not Done'),
-(585, 672030650, 672030650, 'Silway-7 Integrated School', 'N/A', '', '', 'Mainuswagon', 1, 'Member', 'Not Done'),
+(584, 186997838, 186997838, 'Silway-7 High School', '', '', '', 'Mainuswagon', 1, 'Member', 'Not Done'),
+(585, 672030650, 672030650, 'Silway-7 Integrated School', '', '', '', 'Mainuswagon', 1, 'Member', 'Not Done'),
 (586, 355445501, 355445501, 'Domingo', 'Ivon Joy', '', 'Female', 'Mainuswagon', 1, 'Member', 'Not Done'),
 (587, 774552289, 774552289, 'Semeniego', 'Epifanio Jr.', '', 'Male', 'Mainuswagon', 1, 'Member', 'Not Done'),
 (588, 419578296, 419578296, 'Forsgren', 'Merlinda', '', 'Female', 'Mainuswagon', 1, 'Member', 'Not Done'),
@@ -622,7 +622,7 @@ INSERT INTO `members` (`id`, `user_id`, `member_id`, `last_name`, `first_name`, 
 (595, 900439251, 900439251, 'Sabinay', 'Ofelia', '', 'Female', 'Mainuswagon', 1, 'Member', 'Not Done'),
 (596, 507233678, 507233678, 'Guipo', 'Geraldine', '', 'Female', 'Mainuswagon', 1, 'Member', 'Not Done'),
 (597, 630221119, 630221119, 'Guipo', 'Sheila', '', 'Female', 'Mainuswagon', 1, 'Member', 'Not Done'),
-(598, 738921135, 738921135, 'Hope Church', 'N/A', '', '', 'Mainuswagon', 1, 'Member', 'Not Done'),
+(598, 738921135, 738921135, 'Hope Church', '', '', '', 'Mainuswagon', 1, 'Member', 'Not Done'),
 (599, 909684364, 909684364, 'Junio', 'Cheryl Nor', '', 'Female', 'Mainuswagon', 1, 'Member', 'Not Done'),
 (600, 498855857, 498855857, 'Romito', 'Marilou(2?)', '', 'Female', 'Mainuswagon', 1, 'Member', 'Not Done'),
 (601, 796561674, 796561674, 'Junio', 'Eleanor', '', 'Female', 'Mainuswagon', 1, 'Member', 'Not Done'),
