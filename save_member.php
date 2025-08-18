@@ -113,6 +113,8 @@ function addMember($pdo)
 
         // Insert arrears if amount > 0
         $arrearsAmount = floatval($_POST['currentArrears'] ?? 0);
+        // $total_amount_due = $arrearsAmount;
+
         if ($arrearsAmount > 0) {
             $arrearsStmt = $pdo->prepare("
                 INSERT INTO arrears (transaction_id, member_id, arrears_amount) 
@@ -133,6 +135,7 @@ function addMember($pdo)
             $member_id,
             $_POST['currentReading'],
             $arrearsAmount,
+
             $_POST['lastBillingMonth'] ?? date('F Y')
         ]);
 
@@ -194,6 +197,7 @@ function updateMember($pdo)
 
         // Update or insert arrears
         $arrearsAmount = floatval($_POST['currentArrears'] ?? 0);
+        // $total_amount_due = $arrearsAmount;
 
         // Check if arrears record exists
         $arrearsCheckStmt = $pdo->prepare("SELECT arrears_id FROM arrears WHERE member_id = ?");
@@ -360,7 +364,7 @@ function getMembers($pdo)
                 FROM meter_reading
             ) mr ON m.member_id = mr.member_id AND mr.rn = 1
             ORDER BY m.id DESC
-            LIMIT 50
+            
         ");
 
         $stmt->execute();

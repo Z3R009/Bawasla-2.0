@@ -60,6 +60,48 @@ if (!$select) {
         th:nth-child(2) {
             display: none;
         }
+
+        /* Hide on screen */
+        @media screen {
+
+            td:nth-child(1),
+            th:nth-child(1),
+            td:nth-child(2),
+            th:nth-child(2) {
+                display: none;
+            }
+        }
+
+        /* Show when printing */
+        @media print {
+
+            td:nth-child(1),
+            th:nth-child(1),
+            td:nth-child(2),
+            th:nth-child(2) {
+                display: table-cell;
+            }
+        }
+
+        /* Force Long Bond Paper Layout and Add Margins */
+        @media print {
+            @page {
+                size: 8.5in 13in;
+                /* Long bond paper size */
+                margin: 20mm;
+                /* Adjust margin as needed */
+            }
+
+            body {
+                margin: 0;
+                padding: 0;
+            }
+
+            #print-section {
+                display: block !important;
+                /* Ensure printable div is visible */
+            }
+        }
     </style>
 </head>
 
@@ -125,6 +167,16 @@ if (!$select) {
                         <div class="fw-bold text-end" style="min-width: 250px;">
                             Total Amount Paid: ₱<?php echo number_format($total_paid, 2); ?>
                         </div>
+
+                        <!-- Print Button -->
+                        <!-- Print Button -->
+                        <div class="d-flex justify-content-end mb-3">
+                            <button onclick="printDiv('print-section')" class="btn btn-primary">
+                                <i class="fas fa-print"></i> Print Summary
+                            </button>
+                        </div>
+
+
                     </div>
 
 
@@ -197,6 +249,39 @@ if (!$select) {
 
                     </div>
 
+                    <!-- Hidden Printable Version -->
+                    <div id="print-section" style="display: none;">
+                        <h2>Payment Summary</h2>
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Fullname</th>
+                                    <th>OR Number</th>
+                                    <th>Payment Date</th>
+                                    <th>Current Charges</th>
+                                    <th>Total Amount Due</th>
+                                    <th>Amount Paid</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php
+                                // Re-run the query to fetch data again
+                                $print_query = mysqli_query($connection, "SELECT * FROM history ORDER BY payment_date DESC");
+                                while ($row = mysqli_fetch_assoc($print_query)) {
+                                    echo "<tr>";
+                                    echo "<td>" . htmlspecialchars($row['fullname']) . "</td>";
+                                    echo "<td>" . htmlspecialchars($row['or_number']) . "</td>";
+                                    echo "<td>" . date('F d, Y', strtotime($row['payment_date'])) . "</td>";
+                                    echo "<td>" . htmlspecialchars($row['current_charges']) . "</td>";
+                                    echo "<td>" . htmlspecialchars($row['total_amount_due']) . "</td>";
+                                    echo "<td>" . htmlspecialchars($row['amount_paid']) . "</td>";
+                                    echo "</tr>";
+                                }
+                                ?>
+                            </tbody>
+                        </table>
+                    </div>
+
                 </div>
             </main>
             <?php include "Includes/footer.php"; ?>
@@ -217,6 +302,57 @@ if (!$select) {
             document.getElementById('monthForm').submit();
         });
     </script>
+
+    <script>
+        function printDiv(divId) {
+            // Save original page
+            var originalContents = document.body.innerHTML;
+
+            // Get only the div
+            var printContents = document.getElementById(divId).innerHTML;
+
+            // Replace body with div content
+            document.body.innerHTML = `
+        <style>
+            @page {
+                size: 8.5in 13in; /* Long bond paper */
+                margin: 20mm;     /* Adjust margin */
+            }
+            body {
+                font-family: Arial, sans-serif;
+                margin: 0;
+                padding: 10mm;
+            }
+            table {
+                width: 100%;
+                border-collapse: collapse;
+            }
+            th, td {
+                border: 1px solid black;
+                padding: 5px;
+                text-align: left;
+            }
+            h2 {
+                text-align: center;
+                margin-bottom: 20px;
+            }
+        </style>
+        ${printContents}
+    `;
+
+            // Print
+            window.print();
+
+            // Restore original page
+            document.body.innerHTML = originalContents;
+
+            // Re-run scripts/styles if needed
+            location.reload();
+        }
+    </script>
+
+
+
 
 </body>
 

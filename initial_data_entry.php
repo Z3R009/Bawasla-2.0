@@ -200,7 +200,6 @@ try {
                                         <input type="hidden" id="formAction" name="action" value="add">
 
                                         <div class="col-md-6">
-                                            <h5 class="text-primary mb-3">Member Information</h5>
                                             <div class="mb-3">
                                                 <label for="lastName" class="form-label">Last Name</label>
                                                 <input type="text" class="form-control" id="lastName" name="lastName"
@@ -216,6 +215,11 @@ try {
                                                 <input type="text" class="form-control" id="middleName"
                                                     name="middleName" autocomplete="off">
                                             </div>
+
+                                        </div>
+
+                                        <!-- System Information -->
+                                        <div class="col-md-6">
                                             <div class="mb-3">
                                                 <label for="address" class="form-label">Address</label>
                                                 <select class="form-select" id="address" name="address"
@@ -230,11 +234,6 @@ try {
                                                     <option value="Bibiana">Bibiana</option>
                                                 </select>
                                             </div>
-                                        </div>
-
-                                        <!-- System Information -->
-                                        <div class="col-md-6">
-                                            <h5 class="text-primary mb-3">System Information</h5>
                                             <div class="mb-3">
                                                 <label for="tankNo" class="form-label">Tank Number</label>
                                                 <input type="number" class="form-control" id="tankNo" name="tankNo"
@@ -257,6 +256,9 @@ try {
                                                 </div>
                                                 <small class="form-text text-muted">Enter any existing unpaid
                                                     balance</small>
+
+                                                <!-- <input type="hidden" step="0.01" class="form-control"
+                                                    id="total_amount_due" name="total_amount_due" value="0.00"> -->
                                             </div>
                                         </div>
 
@@ -318,9 +320,12 @@ try {
                 <div class="table-section">
                     <div class="d-flex justify-content-between align-items-center mb-4">
                         <h3><i class="fas fa-users me-2"></i>Recent Members</h3>
+                        <input type="text" id="searchInput" placeholder="Search" onkeyup="filterMembers()">
+
                         <button class="btn btn-info" onclick="loadMembers()">
                             <i class="fas fa-refresh me-2"></i>Refresh List
                         </button>
+
                     </div>
                     <div class="table-responsive">
                         <table class="table table-hover" id="membersTable">
@@ -611,12 +616,41 @@ try {
             tankInput.value = tankMapping[selectedAddress] || '';
         }
 
+        function filterMembers() {
+            const input = document.getElementById('searchInput').value.toLowerCase();
+            const rows = document.querySelectorAll('#membersTableBody tr');
+
+            rows.forEach(row => {
+                const name = row.cells[0].textContent.toLowerCase();
+                const address = row.cells[1].textContent.toLowerCase();
+                const tank = row.cells[2].textContent.toLowerCase();
+
+                if (name.includes(input) || address.includes(input) || tank.includes(input)) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        }
+
+
         // Load members when page loads
         document.addEventListener('DOMContentLoaded', function () {
             loadMembers();
             updateMemberCount();
         });
     </script>
+
+    <!-- mirror arrears == total amount due -->
+
+    <!-- <script>
+        const arrearsInput = document.getElementById('currentArrears');
+        const totalDueInput = document.getElementById('total_amount_due');
+
+        arrearsInput.addEventListener('input', function () {
+            totalDueInput.value = this.value;
+        });
+    </script> -->
 </body>
 
 </html>

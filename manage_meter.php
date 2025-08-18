@@ -123,7 +123,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     if (mysqli_num_rows($result_check) > 0) {
         echo "<script type='text/javascript'>
     alert('A reading for this billing month already exists for the selected member.');
-    window.location = 'dashboard_meter_reader.php';
+    window.location = 'manage_meter.php';
 </script>";
     } else {
         // Insert meter reading

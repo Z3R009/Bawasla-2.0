@@ -69,26 +69,45 @@ $total_paid = $total_row['total_paid'] ?? 0;
             display: none;
         }
 
+        /* Hide on screen */
+        @media screen {
+
+            td:nth-child(1),
+            th:nth-child(1),
+            td:nth-child(2),
+            th:nth-child(2) {
+                display: none;
+            }
+        }
+
+        /* Show when printing */
         @media print {
-            body * {
-                visibility: hidden !important;
+
+            td:nth-child(1),
+            th:nth-child(1),
+            td:nth-child(2),
+            th:nth-child(2) {
+                display: table-cell;
+            }
+        }
+
+        /* Force Long Bond Paper Layout and Add Margins */
+        @media print {
+            @page {
+                size: 8.5in 13in;
+                /* Long bond paper size */
+                margin: 20mm;
+                /* Adjust margin as needed */
             }
 
-            /* Show only the print-section */
-            #print-section,
-            #print-section * {
-                visibility: visible !important;
+            body {
+                margin: 0;
+                padding: 0;
             }
 
-            /* Ensure it's displayed and not hidden */
             #print-section {
-                position: absolute;
-                top: 0;
-                left: 0;
                 display: block !important;
-                width: 100%;
-                background: white;
-                padding: 20px;
+                /* Ensure printable div is visible */
             }
         }
     </style>
@@ -142,9 +161,10 @@ $total_paid = $total_row['total_paid'] ?? 0;
 
                     <!-- Print Button -->
                     <div class="d-flex justify-content-end mb-3">
-                        <button onclick="window.print()" class="btn btn-primary">
+                        <button onclick="printDiv('print-section')" class="btn btn-primary">
                             <i class="fas fa-print"></i> Print Summary
                         </button>
+
                     </div>
 
 
@@ -226,10 +246,8 @@ $total_paid = $total_row['total_paid'] ?? 0;
                                     <th>OR Number</th>
                                     <th>Payment Date</th>
                                     <th>Current Charges</th>
-                                    <th>Discount</th>
                                     <th>Total Amount Due</th>
                                     <th>Amount Paid</th>
-                                    <th>Billing Month</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -242,10 +260,8 @@ $total_paid = $total_row['total_paid'] ?? 0;
                                     echo "<td>" . htmlspecialchars($row['or_number']) . "</td>";
                                     echo "<td>" . date('F d, Y', strtotime($row['payment_date'])) . "</td>";
                                     echo "<td>" . htmlspecialchars($row['current_charges']) . "</td>";
-                                    echo "<td>" . htmlspecialchars($row['discount']) . "</td>";
                                     echo "<td>" . htmlspecialchars($row['total_amount_due']) . "</td>";
                                     echo "<td>" . htmlspecialchars($row['amount_paid']) . "</td>";
-                                    echo "<td>" . htmlspecialchars($row['billing_month']) . "</td>";
                                     echo "</tr>";
                                 }
                                 ?>
@@ -275,6 +291,54 @@ $total_paid = $total_row['total_paid'] ?? 0;
         document.getElementById('month').addEventListener('change', function () {
             document.getElementById('monthForm').submit();
         });
+    </script>
+
+    <script>
+        function printDiv(divId) {
+            // Save original page
+            var originalContents = document.body.innerHTML;
+
+            // Get only the div
+            var printContents = document.getElementById(divId).innerHTML;
+
+            // Replace body with div content
+            document.body.innerHTML = `
+        <style>
+            @page {
+                size: 8.5in 13in; /* Long bond paper */
+                margin: 20mm;     /* Adjust margin */
+            }
+            body {
+                font-family: Arial, sans-serif;
+                margin: 0;
+                padding: 10mm;
+            }
+            table {
+                width: 100%;
+                border-collapse: collapse;
+            }
+            th, td {
+                border: 1px solid black;
+                padding: 5px;
+                text-align: left;
+            }
+            h2 {
+                text-align: center;
+                margin-bottom: 20px;
+            }
+        </style>
+        ${printContents}
+    `;
+
+            // Print
+            window.print();
+
+            // Restore original page
+            document.body.innerHTML = originalContents;
+
+            // Re-run scripts/styles if needed
+            location.reload();
+        }
     </script>
 
 </body>
