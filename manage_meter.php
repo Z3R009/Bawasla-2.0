@@ -132,7 +132,19 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             VALUES ('$reading_id', '$user_id', '$member_id', '$previous_reading', '$current_reading', 
             '$total_usage', '$current_charges', '$arrears_amount', '$total_amount_due', '$due_date', '$disconnection_date', '$billing_month', 'Not Paid')";
 
-        if ($connection->query($sql_reading)) {
+        $sql_invoice = "INSERT INTO invoice (reading_id, user_id, member_id, previous_reading, 
+            current_reading, total_usage, current_charges, arrears_amount, total_amount_due, due_date, disconnection_date, billing_month, status) 
+            VALUES ('$reading_id', '$user_id', '$member_id', '$previous_reading', '$current_reading', 
+            '$total_usage', '$current_charges', '$arrears_amount', '$total_amount_due', '$due_date', '$disconnection_date', '$billing_month', 'Not Paid')";
+
+        if ($connection->query($sql_reading) && $connection->query($sql_invoice)) {
+            // Remove prior overdue unpaid meter readings for this member to avoid redundancy
+            $current_date = date('Y-m-d');
+            $sql_delete_old_unpaid = "DELETE FROM meter_reading WHERE member_id = '$member_id' AND status = 'Not Paid' AND reading_id <> '$reading_id' AND due_date < '$current_date'";
+            if (!$connection->query($sql_delete_old_unpaid)) {
+                echo "Error deleting old unpaid readings: " . $connection->error;
+            }
+
             // Delete arrears since they're now included in the current bill
             $sql_delete_arrears = "DELETE FROM arrears WHERE member_id = '$member_id'";
             $sql_update_isDone = "UPDATE members SET isDone = 'Done' WHERE member_id = '$member_id'";

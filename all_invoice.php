@@ -184,15 +184,15 @@ if (isset($_GET['member_id'])) {
                                         // Fetch member information and required fields
                                         $sql = "SELECT members.member_id, 
                                             CONCAT(members.last_name, ', ', members.first_name, ' ', members.middle_name) AS fullname, 
-                                            meter_reading.current_charges,
-                                            meter_reading.arrears_amount,
-                                            meter_reading.total_amount_due,
-                                            meter_reading.reading_id,
-                                            meter_reading.reading_date,
-                                            meter_reading.billing_month, 
-                                            meter_reading.total_usage
-                                         FROM meter_reading
-                                         JOIN members ON meter_reading.member_id = members.member_id
+                                            invoice.current_charges,
+                                            invoice.arrears_amount,
+                                            invoice.total_amount_due,
+                                            invoice.reading_id,
+                                            invoice.reading_date,
+                                            invoice.billing_month, 
+                                            invoice.total_usage
+                                         FROM invoice
+                                         JOIN members ON invoice.member_id = members.member_id
                                          WHERE members.member_id = '$member_id' ORDER BY reading_date DESC ";
 
                                         // Execute the query

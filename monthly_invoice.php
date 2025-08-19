@@ -13,7 +13,7 @@ $selected_month = isset($_GET['month']) ? $_GET['month'] : '';
 $month_filter_sql = "";
 
 // Fetch unique months from reading_date
-$months_sql = "SELECT DISTINCT DATE_FORMAT(reading_date, '%Y-%m') AS month FROM meter_reading ORDER BY month DESC";
+$months_sql = "SELECT DISTINCT DATE_FORMAT(reading_date, '%Y-%m') AS month FROM invoice ORDER BY month DESC";
 $months_result = mysqli_query($connection, $months_sql);
 
 // Prepare filter if month is selected
@@ -26,7 +26,7 @@ $sql = "SELECT
             mr.*, 
             CONCAT(m.last_name, ', ', m.first_name, ' ', m.middle_name) AS fullname,
             m.address 
-        FROM meter_reading mr
+        FROM invoice mr
         JOIN members m ON mr.member_id = m.member_id
         $month_filter_sql
         ORDER BY mr.reading_date DESC";
@@ -36,7 +36,7 @@ $result = mysqli_query($connection, $sql);
 
 // Calculate total amount due for selected month
 $total_due_sql = "SELECT SUM(mr.total_amount_due) AS total_due
-                  FROM meter_reading mr
+                  FROM invoice mr
                   $month_filter_sql";
 $total_due_result = mysqli_query($connection, $total_due_sql);
 $total_due_row = mysqli_fetch_assoc($total_due_result);
