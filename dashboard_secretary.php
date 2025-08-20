@@ -1,4 +1,3 @@
-<!-- dfhdhfhdf -->
 <?php
 include 'DBConnection.php';
 
@@ -12,7 +11,6 @@ if (isset($_SESSION['user_id'])) {
 }
 
 // retrieve/if done reading
-
 $select_isDone = mysqli_query($connection, "
     SELECT 
         members.member_id, 
@@ -23,7 +21,6 @@ $select_isDone = mysqli_query($connection, "
 ");
 
 // retrieve status/paid not paid
-
 $select_status = mysqli_query($connection, "
     SELECT 
         members.member_id, 
@@ -200,9 +197,68 @@ while ($row = mysqli_fetch_assoc($result_payment_methods_count)) {
     $walkin_counts[] = $row['walkin_count'];
 }
 
+// NEW: Fetch daily payment records by address (amount paid per address today)
+$sql_daily_payments = "
+    SELECT m.address AS address, 
+           SUM(h.amount_paid) AS daily_amount
+    FROM members m
+    JOIN history h ON m.member_id = h.member_id
+    WHERE DATE(h.payment_date) = CURDATE()";
+
+if ($selected_month) {
+    $sql_daily_payments .= " AND MONTHNAME(h.payment_date) = ?";
+}
+
+$sql_daily_payments .= " GROUP BY m.address ORDER BY daily_amount DESC";
+
+$stmt_daily_payments = $connection->prepare($sql_daily_payments);
+
+if ($selected_month) {
+    $stmt_daily_payments->bind_param("s", $selected_month);
+    $stmt_daily_payments->execute();
+    $result_daily_payments = $stmt_daily_payments->get_result();
+} else {
+    $result_daily_payments = $connection->query($sql_daily_payments);
+}
+
+$daily_addresses = [];
+$daily_amounts = [];
+while ($row = mysqli_fetch_assoc($result_daily_payments)) {
+    $daily_addresses[] = $row['address'];
+    $daily_amounts[] = $row['daily_amount'];
+}
+
+// NEW: Fetch overall payment records by address (total amount paid per address)
+$sql_overall_payments = "
+    SELECT m.address AS address, 
+           SUM(h.amount_paid) AS total_amount
+    FROM members m
+    JOIN history h ON m.member_id = h.member_id";
+
+if ($selected_month) {
+    $sql_overall_payments .= " WHERE MONTHNAME(h.payment_date) = ?";
+}
+
+$sql_overall_payments .= " GROUP BY m.address ORDER BY total_amount DESC";
+
+$stmt_overall_payments = $connection->prepare($sql_overall_payments);
+
+if ($selected_month) {
+    $stmt_overall_payments->bind_param("s", $selected_month);
+    $stmt_overall_payments->execute();
+    $result_overall_payments = $stmt_overall_payments->get_result();
+} else {
+    $result_overall_payments = $connection->query($sql_overall_payments);
+}
+
+$overall_addresses = [];
+$overall_amounts = [];
+while ($row = mysqli_fetch_assoc($result_overall_payments)) {
+    $overall_addresses[] = $row['address'];
+    $overall_amounts[] = $row['total_amount'];
+}
 
 ?>
-
 
 <!DOCTYPE html>
 <html lang="en">
@@ -455,7 +511,6 @@ while ($row = mysqli_fetch_assoc($result_payment_methods_count)) {
             <main>
                 <div class="container-fluid px-4">
 
-                    <!-- <h1 class="mt-4 d-flex">Dashboard</h1> -->
                     <ol class="breadcrumb mb-4">
                     </ol>
                     <div class="container-fluid px-4">
@@ -551,6 +606,30 @@ while ($row = mysqli_fetch_assoc($result_payment_methods_count)) {
                             </div>
                         </div>
 
+                        <!-- NEW: Daily Payment Records Chart -->
+                        <div class="container-fluid px-4">
+                            <div class="row">
+                                <div class="col-12 mb-4">
+                                    <div class="box">
+                                        <h6>Daily Payment Records by Address (Today)</h6>
+                                        <canvas id="dailyPaymentChart"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- NEW: Overall Payment Records Chart -->
+                        <div class="container-fluid px-4">
+                            <div class="row">
+                                <div class="col-12 mb-4">
+                                    <div class="box">
+                                        <h6>Overall Payment Records by Address</h6>
+                                        <canvas id="overallPaymentChart"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
                         <div class="container-fluid px-4">
                             <div class="row">
                                 <div class="col-12 mb-4">
@@ -562,7 +641,7 @@ while ($row = mysqli_fetch_assoc($result_payment_methods_count)) {
                             </div>
                         </div>
 
-                        <div class="container-fluid px-4">
+                        <!-- <div class="container-fluid px-4">
                             <div class="row">
                                 <div class="col-12 mb-4">
                                     <div class="box">
@@ -571,31 +650,9 @@ while ($row = mysqli_fetch_assoc($result_payment_methods_count)) {
                                     </div>
                                 </div>
                             </div>
-                        </div>
+                        </div> -->
 
                     </div>
-
-                    <!-- <div class="card mb-4">
-                        <div class="card-body">
-                            <table id="datatablesSimple">
-                                <thead>
-                                    <tr>
-                                        <th>Fullname</th>
-                                        <th>Done Reading</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <?php while ($row = mysqli_fetch_assoc($select_isDone)) { ?>
-                                        <tr>
-                                            <td><?php echo htmlspecialchars($row['fullname']); ?></td>
-                                            <td><?php echo htmlspecialchars($row['isDone']); ?></td>
-
-                                        </tr>
-                                    <?php } ?>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div> -->
 
                     <div class="card mb-4">
                         <div class="card-body">
@@ -644,6 +701,12 @@ while ($row = mysqli_fetch_assoc($result_payment_methods_count)) {
         var memberCounts = <?php echo json_encode($member_counts); ?>;
         var gcashCounts = <?php echo json_encode($gcash_counts); ?>;
         var walkinCounts = <?php echo json_encode($walkin_counts); ?>;
+
+        // NEW: Payment data for new charts
+        var dailyAddresses = <?php echo json_encode($daily_addresses); ?>;
+        var dailyAmounts = <?php echo json_encode($daily_amounts); ?>;
+        var overallAddresses = <?php echo json_encode($overall_addresses); ?>;
+        var overallAmounts = <?php echo json_encode($overall_amounts); ?>;
 
         // Modern color palette
         const modernColors = [
@@ -741,6 +804,158 @@ while ($row = mysqli_fetch_assoc($result_payment_methods_count)) {
                     },
                     y: {
                         grid: { color: '#f4f6fb' },
+                        ticks: { color: '#7b8ca7', font: { weight: 'bold', size: 12 } }
+                    }
+                },
+                animation: {
+                    duration: 1200,
+                    easing: 'easeOutQuart'
+                }
+            },
+            plugins: [ChartDataLabels]
+        });
+
+        // NEW: Daily Payment Records Chart (Horizontal Bar Chart)
+        var ctxDaily = document.getElementById('dailyPaymentChart').getContext('2d');
+        var dailyPaymentChart = new Chart(ctxDaily, {
+            type: 'horizontalBar',
+            data: {
+                labels: dailyAddresses,
+                datasets: [{
+                    label: 'Daily Payment Amount',
+                    data: dailyAmounts,
+                    backgroundColor: function (context) {
+                        const chart = context.chart;
+                        const { ctx, chartArea } = chart;
+                        if (!chartArea) return '#43e97b';
+                        return getGradient(ctx, chartArea, '#43e97b', '#f9ea8f');
+                    },
+                    borderRadius: 8,
+                    borderSkipped: false,
+                    maxBarThickness: 35,
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    datalabels: {
+                        align: 'end',
+                        anchor: 'end',
+                        color: '#2c3e50',
+                        font: { weight: 'bold', size: 12 },
+                        backgroundColor: 'rgba(255,255,255,0.9)',
+                        borderRadius: 4,
+                        padding: 4,
+                        clamp: true,
+                        clip: true,
+                        display: function (context) {
+                            return context.dataset.data[context.dataIndex] > 0;
+                        },
+                        formatter: function (value) {
+                            return value > 0 ? '₱' + value.toLocaleString() : '';
+                        }
+                    },
+                    tooltip: {
+                        backgroundColor: '#fff',
+                        titleColor: '#43e97b',
+                        bodyColor: '#2c3e50',
+                        borderColor: '#43e97b',
+                        borderWidth: 1,
+                        padding: 12,
+                        displayColors: false,
+                        callbacks: {
+                            label: function (context) {
+                                return 'Today: ₱' + context.parsed.x.toLocaleString();
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        grid: { color: '#f4f6fb' },
+                        ticks: { color: '#7b8ca7', font: { weight: 'bold', size: 12 } }
+                    },
+                    y: {
+                        grid: { display: false },
+                        ticks: { color: '#7b8ca7', font: { weight: 'bold', size: 12 } }
+                    }
+                },
+                animation: {
+                    duration: 1200,
+                    easing: 'easeOutQuart'
+                }
+            },
+            plugins: [ChartDataLabels]
+        });
+
+        // NEW: Overall Payment Records Chart (Horizontal Bar Chart)
+        var ctxOverall = document.getElementById('overallPaymentChart').getContext('2d');
+        var overallPaymentChart = new Chart(ctxOverall, {
+            type: 'horizontalBar',
+            data: {
+                labels: overallAddresses,
+                datasets: [{
+                    label: 'Total Payment Amount',
+                    data: overallAmounts,
+                    backgroundColor: function (context) {
+                        const chart = context.chart;
+                        const { ctx, chartArea } = chart;
+                        if (!chartArea) return '#ff6a88';
+                        return getGradient(ctx, chartArea, '#ff6a88', '#ffb86c');
+                    },
+                    borderRadius: 8,
+                    borderSkipped: false,
+                    maxBarThickness: 35,
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    datalabels: {
+                        align: 'end',
+                        anchor: 'end',
+                        color: '#2c3e50',
+                        font: { weight: 'bold', size: 12 },
+                        backgroundColor: 'rgba(255,255,255,0.9)',
+                        borderRadius: 4,
+                        padding: 4,
+                        clamp: true,
+                        clip: true,
+                        display: function (context) {
+                            return context.dataset.data[context.dataIndex] > 0;
+                        },
+                        formatter: function (value) {
+                            return value > 0 ? '₱' + value.toLocaleString() : '';
+                        }
+                    },
+                    tooltip: {
+                        backgroundColor: '#fff',
+                        titleColor: '#ff6a88',
+                        bodyColor: '#2c3e50',
+                        borderColor: '#ff6a88',
+                        borderWidth: 1,
+                        padding: 12,
+                        displayColors: false,
+                        callbacks: {
+                            label: function (context) {
+                                return 'Total: ₱' + context.parsed.x.toLocaleString();
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        grid: { color: '#f4f6fb' },
+                        ticks: { color: '#7b8ca7', font: { weight: 'bold', size: 12 } }
+                    },
+                    y: {
+                        grid: { display: false },
                         ticks: { color: '#7b8ca7', font: { weight: 'bold', size: 12 } }
                     }
                 },
