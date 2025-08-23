@@ -138,65 +138,6 @@ while ($row = mysqli_fetch_assoc($result_avg_charges)) {
     $avg_charges[] = $row['avg_charges'];
 }
 
-// Fetch the count of members by payment method
-$sql_payment_methods_count = "
-SELECT payment_method, COUNT(*) AS member_count
-FROM history";
-
-if ($selected_month) {
-    $sql_payment_methods_count .= " WHERE MONTHNAME(payment_date) = ?";
-}
-$sql_payment_methods_count .= " GROUP BY payment_method";
-
-$stmt_payment_methods_count = $connection->prepare($sql_payment_methods_count);
-
-if ($selected_month) {
-    $stmt_payment_methods_count->bind_param("s", $selected_month);
-    $stmt_payment_methods_count->execute();
-    $result_payment_methods_count = $stmt_payment_methods_count->get_result();
-} else {
-    $result_payment_methods_count = $connection->query($sql_payment_methods_count);
-}
-
-$payment_methods = [];
-$member_counts = [];
-while ($row = mysqli_fetch_assoc($result_payment_methods_count)) {
-    $payment_methods[] = $row['payment_method'];
-    $member_counts[] = $row['member_count'];
-}
-
-// Fetch total members who paid using G-Cash or Walk-in by Purok
-$sql_payment_methods_count = "
-SELECT m.address AS address, 
-       SUM(CASE WHEN t.payment_method = 'G-Cash' THEN 1 ELSE 0 END) AS gcash_count,
-       SUM(CASE WHEN t.payment_method = 'Walk-in' THEN 1 ELSE 0 END) AS walkin_count
-FROM members m
-JOIN history t ON m.member_id = t.member_id";
-
-if ($selected_month) {
-    $sql_payment_methods_count .= " WHERE MONTHNAME(t.payment_date) = ?";
-}
-
-$sql_payment_methods_count .= " GROUP BY m.address";
-
-$stmt_payment_methods_count = $connection->prepare($sql_payment_methods_count);
-
-if ($selected_month) {
-    $stmt_payment_methods_count->bind_param("s", $selected_month);
-    $stmt_payment_methods_count->execute();
-    $result_payment_methods_count = $stmt_payment_methods_count->get_result();
-} else {
-    $result_payment_methods_count = $connection->query($sql_payment_methods_count);
-}
-
-$gcash_counts = [];
-$walkin_counts = [];
-
-while ($row = mysqli_fetch_assoc($result_payment_methods_count)) {
-    $gcash_counts[] = $row['gcash_count'];
-    $walkin_counts[] = $row['walkin_count'];
-}
-
 // NEW: Fetch daily payment records by address (amount paid per address today)
 $sql_daily_payments = "
     SELECT m.address AS address, 
@@ -606,7 +547,7 @@ while ($row = mysqli_fetch_assoc($result_overall_payments)) {
                             </div>
                         </div>
 
-                        <!-- NEW: Daily Payment Records Chart -->
+                        <!-- Daily Payment Records Chart -->
                         <div class="container-fluid px-4">
                             <div class="row">
                                 <div class="col-12 mb-4">
@@ -618,7 +559,7 @@ while ($row = mysqli_fetch_assoc($result_overall_payments)) {
                             </div>
                         </div>
 
-                        <!-- NEW: Overall Payment Records Chart -->
+                        <!-- Overall Payment Records Chart -->
                         <div class="container-fluid px-4">
                             <div class="row">
                                 <div class="col-12 mb-4">
@@ -629,28 +570,6 @@ while ($row = mysqli_fetch_assoc($result_overall_payments)) {
                                 </div>
                             </div>
                         </div>
-
-                        <div class="container-fluid px-4">
-                            <div class="row">
-                                <div class="col-12 mb-4">
-                                    <div class="box">
-                                        <h6>Payment Method Used</h6>
-                                        <canvas id="paymentMethodChart"></canvas>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- <div class="container-fluid px-4">
-                            <div class="row">
-                                <div class="col-12 mb-4">
-                                    <div class="box">
-                                        <h6>Payment Methods by Purok (G-Cash vs Walk-in)</h6>
-                                        <canvas id="paymentChart"></canvas>
-                                    </div>
-                                </div>
-                            </div>
-                        </div> -->
 
                     </div>
 
@@ -697,12 +616,7 @@ while ($row = mysqli_fetch_assoc($result_overall_payments)) {
         var totalCharges = <?php echo json_encode($total_charges); ?>;
         var avgCharges = <?php echo json_encode($avg_charges); ?>;
 
-        var paymentMethods = <?php echo json_encode($payment_methods); ?>;
-        var memberCounts = <?php echo json_encode($member_counts); ?>;
-        var gcashCounts = <?php echo json_encode($gcash_counts); ?>;
-        var walkinCounts = <?php echo json_encode($walkin_counts); ?>;
-
-        // NEW: Payment data for new charts
+        // Payment data for new charts
         var dailyAddresses = <?php echo json_encode($daily_addresses); ?>;
         var dailyAmounts = <?php echo json_encode($daily_amounts); ?>;
         var overallAddresses = <?php echo json_encode($overall_addresses); ?>;
@@ -815,7 +729,7 @@ while ($row = mysqli_fetch_assoc($result_overall_payments)) {
             plugins: [ChartDataLabels]
         });
 
-        // NEW: Daily Payment Records Chart (Horizontal Bar Chart)
+        // Daily Payment Records Chart (Horizontal Bar Chart)
         var ctxDaily = document.getElementById('dailyPaymentChart').getContext('2d');
         var dailyPaymentChart = new Chart(ctxDaily, {
             type: 'horizontalBar',
@@ -891,7 +805,7 @@ while ($row = mysqli_fetch_assoc($result_overall_payments)) {
             plugins: [ChartDataLabels]
         });
 
-        // NEW: Overall Payment Records Chart (Horizontal Bar Chart)
+        // Overall Payment Records Chart (Horizontal Bar Chart)
         var ctxOverall = document.getElementById('overallPaymentChart').getContext('2d');
         var overallPaymentChart = new Chart(ctxOverall, {
             type: 'horizontalBar',
@@ -957,68 +871,6 @@ while ($row = mysqli_fetch_assoc($result_overall_payments)) {
                     y: {
                         grid: { display: false },
                         ticks: { color: '#7b8ca7', font: { weight: 'bold', size: 12 } }
-                    }
-                },
-                animation: {
-                    duration: 1200,
-                    easing: 'easeOutQuart'
-                }
-            },
-            plugins: [ChartDataLabels]
-        });
-
-        // Payment Method (Pie Chart)
-        var ctx2 = document.getElementById('paymentMethodChart').getContext('2d');
-        var paymentMethodChart = new Chart(ctx2, {
-            type: 'doughnut',
-            data: {
-                labels: paymentMethods,
-                datasets: [{
-                    data: memberCounts,
-                    backgroundColor: modernColors.slice(0, paymentMethods.length),
-                    borderWidth: 2,
-                    borderColor: '#fff',
-                }]
-            },
-            options: {
-                responsive: true,
-                cutout: '70%',
-                plugins: {
-                    legend: {
-                        display: true,
-                        position: 'bottom',
-                        labels: {
-                            color: '#2c3e50',
-                            font: { weight: 'bold', size: 12 }
-                        }
-                    },
-                    datalabels: {
-                        color: '#2c3e50',
-                        font: { weight: 'bold', size: 12 },
-                        backgroundColor: 'rgba(255,255,255,0.85)',
-                        borderRadius: 4,
-                        padding: 2,
-                        clamp: true,
-                        clip: true,
-                        formatter: function (value, ctx) {
-                            let sum = ctx.chart.data.datasets[0].data.reduce((a, b) => a + b, 0);
-                            let percentage = (value * 100 / sum).toFixed(1) + '%';
-                            return percentage;
-                        }
-                    },
-                    tooltip: {
-                        backgroundColor: '#fff',
-                        titleColor: '#6c63ff',
-                        bodyColor: '#2c3e50',
-                        borderColor: '#6c63ff',
-                        borderWidth: 1,
-                        padding: 12,
-                        displayColors: false,
-                        callbacks: {
-                            label: function (context) {
-                                return context.label + ': ' + context.parsed + ' members';
-                            }
-                        }
                     }
                 },
                 animation: {
@@ -1123,128 +975,6 @@ while ($row = mysqli_fetch_assoc($result_overall_payments)) {
                 animation: {
                     duration: 1200,
                     easing: 'easeOutQuart'
-                }
-            },
-            plugins: [ChartDataLabels]
-        });
-
-        var paymentChart;
-        function getGcashGradient(ctx, chartArea) {
-            var gradient = ctx.createLinearGradient(0, chartArea.top, 0, chartArea.bottom);
-            gradient.addColorStop(0, 'rgba(76,99,255,0.9)');
-            gradient.addColorStop(1, 'rgba(76,99,255,0.3)');
-            return gradient;
-        }
-        function getWalkinGradient(ctx, chartArea) {
-            var gradient = ctx.createLinearGradient(0, chartArea.top, 0, chartArea.bottom);
-            gradient.addColorStop(0, 'rgba(255,106,136,0.9)');
-            gradient.addColorStop(1, 'rgba(255,106,136,0.3)');
-            return gradient;
-        }
-        var ctxPayment = document.getElementById('paymentChart').getContext('2d');
-        paymentChart = new Chart(ctxPayment, {
-            type: 'bar',
-            data: {
-                labels: addresses,
-                datasets: [
-                    {
-                        label: 'G-Cash',
-                        data: gcashCounts,
-                        backgroundColor: 'rgba(76,99,255,1)',
-                        borderRadius: 12,
-                        borderSkipped: false,
-                        maxBarThickness: 40,
-                    },
-                    {
-                        label: 'Walk-in',
-                        data: walkinCounts,
-                        backgroundColor: 'rgba(255,106,136,1)',
-                        borderRadius: 12,
-                        borderSkipped: false,
-                        maxBarThickness: 40,
-                    }
-                ]
-            },
-            options: {
-                responsive: true,
-                plugins: {
-                    legend: {
-                        position: 'top',
-                        labels: {
-                            color: '#2c3e50',
-                            font: { weight: 'bold', size: 14 }
-                        }
-                    },
-                    datalabels: {
-                        align: function (context) {
-                            var value = context.dataset.data[context.dataIndex];
-                            var scales = context.chart.scales;
-                            var max = (scales['y-axis-0'] || scales['y']).max;
-                            return value >= 0.6 * max ? 'center' : 'end';
-                        },
-                        anchor: function (context) {
-                            var value = context.dataset.data[context.dataIndex];
-                            var scales = context.chart.scales;
-                            var max = (scales['y-axis-0'] || scales['y']).max;
-                            return value >= 0.6 * max ? 'center' : 'end';
-                        },
-                        color: function (context) {
-                            var value = context.dataset.data[context.dataIndex];
-                            var scales = context.chart.scales;
-                            var max = (scales['y-axis-0'] || scales['y']).max;
-                            return value >= 0.6 * max ? '#fff' : '#2c3e50';
-                        },
-                        font: { weight: 'bold', size: 13 },
-                        backgroundColor: function (context) {
-                            var value = context.dataset.data[context.dataIndex];
-                            var scales = context.chart.scales;
-                            var max = (scales['y-axis-0'] || scales['y']).max;
-                            return value >= 0.6 * max ? 'rgba(44,99,255,0.7)' : 'rgba(255,255,255,0.85)';
-                        },
-                        borderRadius: 4,
-                        padding: 2,
-                        clamp: true,
-                        clip: true,
-                        display: function (context) {
-                            return context.dataset.data[context.dataIndex] > 0;
-                        },
-                        formatter: function (value) { return value; }
-                    }
-                },
-                scales: {
-                    xAxes: [{
-                        stacked: true,
-                        gridLines: { display: false },
-                        ticks: { color: '#7b8ca7', font: { weight: 'bold' } }
-                    }],
-                    yAxes: [{
-                        stacked: true,
-                        gridLines: { color: '#f4f6fb' },
-                        ticks: { color: '#7b8ca7', font: { weight: 'bold' } }
-                    }]
-                },
-                animation: {
-                    duration: 1200,
-                    easing: 'easeOutQuart',
-                    onComplete: function (animation) {
-                        var chart = animation.chart || paymentChart;
-                        var chartArea = chart.chartArea;
-                        chart.data.datasets[0].backgroundColor = function (context) {
-                            var chart = context.chart || context._chart;
-                            var ctx = chart.ctx;
-                            var chartArea = chart.chartArea;
-                            if (!chartArea) return 'rgba(76,99,255,1)';
-                            return getGcashGradient(ctx, chartArea);
-                        };
-                        chart.data.datasets[1].backgroundColor = function (context) {
-                            var chart = context.chart || context._chart;
-                            var ctx = chart.ctx;
-                            var chartArea = chart.chartArea;
-                            if (!chartArea) return 'rgba(255,106,136,1)';
-                            return getWalkinGradient(ctx, chartArea);
-                        };
-                        chart.update();
-                    }
                 }
             },
             plugins: [ChartDataLabels]

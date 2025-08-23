@@ -9,28 +9,34 @@ if (isset($_SESSION['user_id'])) {
     exit();
 }
 
-// Retrieve users with unpaid meter readings
+// Retrieve users with unpaid meter readings - only one record per member
 $select = mysqli_query($connection, "
     SELECT 
-        meter_reading.reading_date, 
+        mr.reading_date, 
         CONCAT(members.last_name, ', ', members.first_name, ' ', members.middle_name) AS fullname,
         members.tank_no,   
         members.address, 
-        meter_reading.current_charges,
-        meter_reading.reading_id,
-        meter_reading.total_usage,
-        meter_reading.member_id,
-        meter_reading.due_date,
-        meter_reading.disconnection_date,
-        meter_reading.billing_month,
-        meter_reading.arrears_amount,
-        meter_reading.total_amount_due
+        mr.current_charges,
+        mr.reading_id,
+        mr.total_usage,
+        mr.member_id,
+        mr.due_date,
+        mr.disconnection_date,
+        mr.billing_month,
+        mr.arrears_amount,
+        mr.total_amount_due
     FROM 
-        meter_reading
+        meter_reading mr
     JOIN 
-        members ON meter_reading.member_id = members.member_id
-    WHERE meter_reading.status = 'Not Paid'
-    ORDER BY reading_date DESC
+        members ON mr.member_id = members.member_id
+    WHERE mr.status = 'Not Paid'
+    AND mr.reading_id = (
+        SELECT MAX(reading_id) 
+        FROM meter_reading mr2 
+        WHERE mr2.member_id = mr.member_id 
+        AND mr2.status = 'Not Paid'
+    )
+    ORDER BY mr.reading_date DESC
 ");
 
 // Insert transaction
@@ -181,8 +187,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                                             <td>
                                                 <span id="tank_no_<?php echo $row['member_id']; ?>">Tank No:
                                                     <?php echo htmlspecialchars($row['tank_no']); ?></span><br>
-                                                <span id="meter_no_<?php echo $row['member_id']; ?>">Meter No:
-                                                    <?php echo htmlspecialchars($row['meter_no']); ?></span><br>
                                                 <span id="address_no_<?php echo $row['member_id']; ?>">Address:
                                                     <?php echo htmlspecialchars($row['address']); ?></span>
                                             </td>
@@ -288,11 +292,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                                                     <input type="hidden" class="form-control" id="edit_tank_no"
                                                         name="tank_no" readonly>
                                                 </div>
-                                                <div class="col-md-4 mb-3">
-                                                    <!-- <label for="meter_no" class="form-label">Meter Number</label> -->
-                                                    <input type="hidden" class="form-control" id="edit_meter_no"
-                                                        name="meter_no" readonly>
-                                                </div>
+
                                                 <div class="col-md-4 mb-3">
                                                     <!-- <label for="address" class="form-label">Address</label> -->
                                                     <input type="hidden" class="form-control" id="edit_address"
@@ -390,7 +390,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             var fullname = button.getAttribute('data-fullname');
             var address = button.getAttribute('data-address');
             var tankNo = button.getAttribute('data-tankno');
-            var meterNo = button.getAttribute('data-meterno');
             var dueDate = button.getAttribute('data-duedate');
             var disconnectionDate = button.getAttribute('data-disconnectiondate');
             var currentCharges = button.getAttribute('data-current_charges');
@@ -405,7 +404,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             document.getElementById('edit_fullname').value = fullname;
             document.getElementById('edit_address').value = address;
             document.getElementById('edit_tank_no').value = tankNo;
-            document.getElementById('edit_meter_no').value = meterNo;
             document.getElementById('edit_due_date').value = dueDate;
             document.getElementById('edit_current_charges').value = currentCharges;
             document.getElementById('edit_disconnection_date').value = disconnectionDate;
