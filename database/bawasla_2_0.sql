@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Aug 06, 2025 at 03:03 PM
+-- Generation Time: Aug 31, 2025 at 02:53 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -58,6 +58,31 @@ CREATE TABLE `history` (
   `amount_paid` double(40,2) NOT NULL,
   `billing_month` varchar(255) NOT NULL,
   `payment_method` enum('Walk-In','G-Cash') NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `invoice`
+--
+
+CREATE TABLE `invoice` (
+  `reading_id` int(255) NOT NULL,
+  `user_id` int(255) NOT NULL,
+  `member_id` int(255) NOT NULL,
+  `reading_date` date NOT NULL DEFAULT current_timestamp(),
+  `time` time NOT NULL DEFAULT current_timestamp(),
+  `previous_reading` int(255) NOT NULL,
+  `current_reading` int(255) NOT NULL,
+  `total_usage` int(50) NOT NULL,
+  `current_charges` double(40,2) NOT NULL,
+  `arrears_amount` double(40,2) NOT NULL,
+  `total_amount_due` double(40,2) NOT NULL,
+  `due_date` date NOT NULL,
+  `disconnection_date` date NOT NULL,
+  `billing_month` varchar(20) NOT NULL,
+  `status` enum('Paid','Not Paid','Pending','Overdue') NOT NULL DEFAULT 'Not Paid',
+  `arrears_processed` tinyint(1) DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
