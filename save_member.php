@@ -61,6 +61,36 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     exit;
 }
 
+function rolloverUnpaidToArrears($pdo, $memberId)
+{
+    // Move the latest unpaid total_amount_due into arrears and mark it as Rolled Over
+    $unpaidStmt = $pdo->prepare("SELECT reading_id, total_amount_due FROM meter_reading WHERE member_id = ? AND status = 'Not Paid' AND total_amount_due > 0 ORDER BY reading_date DESC LIMIT 1");
+    $unpaidStmt->execute([$memberId]);
+    $unpaid = $unpaidStmt->fetch(PDO::FETCH_ASSOC);
+
+    if ($unpaid) {
+        $amountToRollover = (float)$unpaid['total_amount_due'];
+
+        // Add to existing arrears or insert
+        $arrearsGet = $pdo->prepare("SELECT arrears_amount FROM arrears WHERE member_id = ?");
+        $arrearsGet->execute([$memberId]);
+        $existing = $arrearsGet->fetch(PDO::FETCH_ASSOC);
+
+        if ($existing) {
+            $newAmount = (float)$existing['arrears_amount'] + $amountToRollover;
+            $arrearsUpd = $pdo->prepare("UPDATE arrears SET arrears_amount = ? WHERE member_id = ?");
+            $arrearsUpd->execute([$newAmount, $memberId]);
+        } else {
+            $arrearsIns = $pdo->prepare("INSERT INTO arrears (transaction_id, member_id, arrears_amount) VALUES (0, ?, ?)");
+            $arrearsIns->execute([$memberId, $amountToRollover]);
+        }
+
+        // Mark reading as rolled over so it won't show as unpaid
+        $markRolled = $pdo->prepare("UPDATE meter_reading SET status = 'Rolled Over' WHERE reading_id = ?");
+        $markRolled->execute([$unpaid['reading_id']]);
+    }
+}
+
 function addMember($pdo)
 {
     try {
@@ -111,23 +141,24 @@ function addMember($pdo)
             $_POST['tankNo']
         ]);
 
+        // (Changed) Do not roll unpaid totals into arrears on initial entry
+        // rolloverUnpaidToArrears($pdo, $member_id);
+
         // Insert arrears if amount > 0
         $arrearsAmount = floatval($_POST['currentArrears'] ?? 0);
         // $total_amount_due = $arrearsAmount;
 
-        if ($arrearsAmount > 0) {
-            $arrearsStmt = $pdo->prepare("
-                INSERT INTO arrears (transaction_id, member_id, arrears_amount) 
-                VALUES (0, ?, ?)
-            ");
-            $arrearsStmt->execute([$member_id, $arrearsAmount]);
-        }
+        // (Changed) Do not insert into arrears on initial entry
+        // if ($arrearsAmount > 0) {
+        //     $arrearsStmt = $pdo->prepare("\n                INSERT INTO arrears (transaction_id, member_id, arrears_amount) \n                VALUES (0, ?, ?)\n            ");
+        //     $arrearsStmt->execute([$member_id, $arrearsAmount]);
+        // }
 
         // Insert meter reading with proper structure
         $readingId = generateUniqueReadingId($pdo);
         $readingStmt = $pdo->prepare("
             INSERT INTO meter_reading (reading_id, user_id, member_id, reading_date, time, previous_reading, current_reading, total_usage, current_charges, arrears_amount, total_amount_due, due_date, disconnection_date, billing_month, status, arrears_processed) 
-            VALUES (?, 0, ?, NOW(), NOW(), 0, ?, 0, 0, ?, 0, DATE_ADD(NOW(), INTERVAL 30 DAY), DATE_ADD(NOW(), INTERVAL 45 DAY), ?, 'Not Paid', 0)
+            VALUES (?, 0, ?, NOW(), NOW(), 0, ?, 0, 0, 0, ?, DATE_ADD(NOW(), INTERVAL 30 DAY), DATE_ADD(NOW(), INTERVAL 45 DAY), ?, 'Not Paid', 0)
         ");
 
         $readingStmt->execute([
@@ -135,9 +166,12 @@ function addMember($pdo)
             $member_id,
             $_POST['currentReading'],
             $arrearsAmount,
-
             $_POST['lastBillingMonth'] ?? date('F Y')
         ]);
+
+        // (Changed) No mirror needed; total_amount_due already set from entered arrears
+        // $updTotal = $pdo->prepare("UPDATE meter_reading SET total_amount_due = arrears_amount WHERE reading_id = ?");
+        // $updTotal->execute([$readingId]);
 
         $pdo->commit();
 
@@ -178,6 +212,9 @@ function updateMember($pdo)
 
         // Start transaction
         $pdo->beginTransaction();
+
+        // Move any latest unpaid total into arrears to avoid duplication
+        rolloverUnpaidToArrears($pdo, $memberId);
 
         // Update member information
         $memberStmt = $pdo->prepare("
@@ -244,6 +281,10 @@ function updateMember($pdo)
                 $arrearsAmount,
                 $latestReading['reading_id']
             ]);
+
+            // Mirror arrears into total_amount_due
+            $updTotal = $pdo->prepare("UPDATE meter_reading SET total_amount_due = arrears_amount WHERE reading_id = ?");
+            $updTotal->execute([$latestReading['reading_id']]);
         } else {
             // Insert new reading if none exists
             $readingId = generateUniqueReadingId($pdo);
@@ -258,6 +299,10 @@ function updateMember($pdo)
                 $arrearsAmount,
                 $_POST['lastBillingMonth'] ?? date('F Y')
             ]);
+
+            // Mirror arrears into total_amount_due
+            $updTotal = $pdo->prepare("UPDATE meter_reading SET total_amount_due = arrears_amount WHERE reading_id = ?");
+            $updTotal->execute([$readingId]);
         }
 
         $pdo->commit();

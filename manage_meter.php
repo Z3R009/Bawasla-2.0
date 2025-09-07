@@ -116,48 +116,68 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
     $current_reading = $previous_reading + $total_usage;
 
-    // Check for existing billing month
-    $sql_check_billing_month = "SELECT * FROM meter_reading WHERE member_id = '$member_id' AND billing_month = '$billing_month'";
-    $result_check = mysqli_query($connection, $sql_check_billing_month);
-
-    if (mysqli_num_rows($result_check) > 0) {
-        echo "<script type='text/javascript'>
-    alert('A reading for this billing month already exists for the selected member.');
-    window.location = 'manage_meter.php';
-</script>";
-    } else {
-        // Insert meter reading
-        $sql_reading = "INSERT INTO meter_reading (reading_id, user_id, member_id, previous_reading, 
-            current_reading, total_usage, current_charges, arrears_amount, total_amount_due, due_date, disconnection_date, billing_month, status) 
-            VALUES ('$reading_id', '$user_id', '$member_id', '$previous_reading', '$current_reading', 
-            '$total_usage', '$current_charges', '$arrears_amount', '$total_amount_due', '$due_date', '$disconnection_date', '$billing_month', 'Not Paid')";
-
-        $sql_invoice = "INSERT INTO invoice (reading_id, user_id, member_id, previous_reading, 
-            current_reading, total_usage, current_charges, arrears_amount, total_amount_due, due_date, disconnection_date, billing_month, status) 
-            VALUES ('$reading_id', '$user_id', '$member_id', '$previous_reading', '$current_reading', 
-            '$total_usage', '$current_charges', '$arrears_amount', '$total_amount_due', '$due_date', '$disconnection_date', '$billing_month', 'Not Paid')";
-
-        if ($connection->query($sql_reading) && $connection->query($sql_invoice)) {
-            // Remove prior overdue unpaid meter readings for this member to avoid redundancy
-            $current_date = date('Y-m-d');
-            $sql_delete_old_unpaid = "DELETE FROM meter_reading WHERE member_id = '$member_id' AND status = 'Not Paid' AND reading_id <> '$reading_id' AND due_date < '$current_date'";
-            if (!$connection->query($sql_delete_old_unpaid)) {
-                echo "Error deleting old unpaid readings: " . $connection->error;
-            }
-
-            // Delete arrears since they're now included in the current bill
-            $sql_delete_arrears = "DELETE FROM arrears WHERE member_id = '$member_id'";
-            $sql_update_isDone = "UPDATE members SET isDone = 'Done' WHERE member_id = '$member_id'";
-
-            if ($connection->query($sql_delete_arrears) && $connection->query($sql_update_isDone)) {
-                header("Location: manage_meter.php");
-                exit();
-            } else {
-                echo "Error updating member data: " . $connection->error;
-            }
-        } else {
-            echo "Error inserting meter reading: " . $connection->error;
+    // Gather all existing unpaid readings (IDs and sum of totals)
+    $sum_unpaid_amount = 0.00;
+    $unpaid_ids = [];
+    $sql_unpaid = "SELECT reading_id, total_amount_due FROM meter_reading WHERE member_id = '$member_id' AND status = 'Not Paid'";
+    $result_unpaid = mysqli_query($connection, $sql_unpaid);
+    if ($result_unpaid && mysqli_num_rows($result_unpaid) > 0) {
+        while ($r = mysqli_fetch_assoc($result_unpaid)) {
+            $sum_unpaid_amount += (float)$r['total_amount_due'];
+            $unpaid_ids[] = $r['reading_id'];
         }
+    }
+
+    // Compute additional arrears from arrears table that are NOT represented by unpaid readings
+    $arrears_extra = 0.00;
+    if (!empty($unpaid_ids)) {
+        // If there are unpaid readings, ignore arrears table entirely to prevent double counting
+        $arrears_extra = 0.00;
+    } else {
+        $sql_arrears_extra = "SELECT COALESCE(SUM(arrears_amount),0) AS sum_arrears FROM arrears WHERE member_id = '$member_id'";
+        $result_arrears_extra = mysqli_query($connection, $sql_arrears_extra);
+        if ($result_arrears_extra && mysqli_num_rows($result_arrears_extra) > 0) {
+            $a = mysqli_fetch_assoc($result_arrears_extra);
+            $arrears_extra = (float)$a['sum_arrears'];
+        }
+    }
+
+    // Final arrears to carry forward: unpaid totals + any distinct arrears rows
+    $arrears_amount_total = $sum_unpaid_amount + $arrears_extra;
+
+    $current_charges_total = (float)$current_charges;
+    $total_amount_due_total = $arrears_amount_total + $current_charges_total;
+
+    // Insert meter reading (use recomputed values)
+    $sql_reading = "INSERT INTO meter_reading (reading_id, user_id, member_id, previous_reading, 
+            current_reading, total_usage, current_charges, arrears_amount, total_amount_due, due_date, disconnection_date, billing_month, status) 
+            VALUES ('$reading_id', '$user_id', '$member_id', '$previous_reading', '$current_reading', 
+            '$total_usage', '$current_charges_total', '$arrears_amount_total', '$total_amount_due_total', '$due_date', '$disconnection_date', '$billing_month', 'Not Paid')";
+
+    $sql_invoice = "INSERT INTO invoice (reading_id, user_id, member_id, previous_reading, 
+            current_reading, total_usage, current_charges, arrears_amount, total_amount_due, due_date, disconnection_date, billing_month, status) 
+            VALUES ('$reading_id', '$user_id', '$member_id', '$previous_reading', '$current_reading', 
+            '$total_usage', '$current_charges_total', '$arrears_amount_total', '$total_amount_due_total', '$due_date', '$disconnection_date', '$billing_month', 'Not Paid')";
+
+    if ($connection->query($sql_reading) && $connection->query($sql_invoice)) {
+        // Remove all prior unpaid meter readings for this member (avoid redundancy)
+        $sql_delete_old_unpaid = "DELETE FROM meter_reading WHERE member_id = '$member_id' AND status = 'Not Paid' AND reading_id <> '$reading_id'";
+        if (!$connection->query($sql_delete_old_unpaid)) {
+            echo "Error deleting old unpaid readings: " . $connection->error;
+        }
+
+        // Clear arrears since they are included in this new bill
+        $sql_delete_arrears = "DELETE FROM arrears WHERE member_id = '$member_id'";
+        $sql_update_isDone = "UPDATE members SET isDone = 'Done' WHERE member_id = '$member_id'";
+
+        if ($connection->query($sql_delete_arrears) && $connection->query($sql_update_isDone)) {
+            header("Location: manage_meter.php");
+            exit();
+        } else {
+            echo "Error updating member data: " . $connection->error;
+        }
+    } else {
+        echo "Error inserting meter reading: " . $connection->error;
     }
 }
 
