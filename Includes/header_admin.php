@@ -17,15 +17,42 @@
             <a class="nav-link dropdown-toggle" id="navbarDropdown" href="#" role="button" data-bs-toggle="dropdown"
                 aria-expanded="false"><i class="fas fa-user fa-fw"></i></a>
             <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
-                <li><a class="dropdown-item" href="manage_account_pres.php?user_id=<?php echo $user_id; ?>"><i
-                            class="fa-solid fa-gear"></i><span style="margin-left: 20px; font-size: large; ">
-                            Account Settings</span></a></li>
+                <li>
+                    <a class="dropdown-item" href="manage_account_pres.php?user_id=<?php echo $user_id; ?>">
+                        <i class="fa-solid fa-gear"></i>
+                        <span style="margin-left: 20px; font-size: large;">Account Settings</span>
+                    </a>
+
+                </li>
                 <hr class="dropdown-divider" />
+                <!-- Backup Button -->
+                <li>
+                    <form method="post" action="backup.php" style="margin:0; padding:0;">
+
+                        <button type="submit" name="backup" class="dropdown-item">
+                            <i class="fa-solid fa-database"></i>
+                            <span style="margin-left: 20px; font-size: large;">Backup Database</span>
+                        </button>
+                    </form>
+
+                </li>
+                <hr class="dropdown-divider" />
+                <li>
+                    <a class="dropdown-item" href="logout.php">
+                        <i class="fa-solid fa-right-from-bracket"></i>
+                        <span style="margin-left: 20px; font-size: large;">Log Out</span>
+                    </a>
+                </li>
+            </ul>
         </li>
-        <li><a class="dropdown-item" href="logout.php"><i class="fa-solid fa-right-from-bracket"></i><span
-                    style="margin-left: 20px; font-size: large; ">
-                    Log Out</span></a></li>
     </ul>
-    </li>
-    </ul>
+
+    <?php if (isset($_GET['backup'])): ?>
+        <?php if ($_GET['backup'] === 'success'): ?>
+            <script>alert("✅ Backup completed successfully!");</script>
+        <?php else: ?>
+            <script>alert("❌ Backup failed. Please check database name or mysqldump path.");</script>
+        <?php endif; ?>
+    <?php endif; ?>
+
 </nav>
