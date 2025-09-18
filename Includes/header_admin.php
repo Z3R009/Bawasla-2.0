@@ -51,7 +51,9 @@
         <?php if ($_GET['backup'] === 'success'): ?>
             <script>alert("✅ Backup completed successfully!");</script>
         <?php else: ?>
-            <script>alert("❌ Backup failed. Please check database name or mysqldump path.");</script>
+            <script>
+                alert("❌ Backup failed. Please check database/mysqldump.\n<?php echo isset($_GET['reason']) ? addslashes($_GET['reason']) : ''; ?>");
+            </script>
         <?php endif; ?>
     <?php endif; ?>
 
